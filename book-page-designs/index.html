@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Page Designs Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .main-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            opacity: 0.95;
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .designs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .design-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.8s ease backwards;
+        }
+
+        .design-card:nth-child(1) { animation-delay: 0.1s; }
+        .design-card:nth-child(2) { animation-delay: 0.2s; }
+        .design-card:nth-child(3) { animation-delay: 0.3s; }
+        .design-card:nth-child(4) { animation-delay: 0.4s; }
+        .design-card:nth-child(5) { animation-delay: 0.5s; }
+
+        .design-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-preview {
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-preview::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            transition: transform 0.4s ease;
+        }
+
+        .design-card:hover .card-preview::before {
+            transform: scale(1.1);
+        }
+
+        .preview-future {
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 100%);
+        }
+
+        .preview-traditional {
+            background: linear-gradient(135deg, #f4e4c1 0%, #e8d5b0 100%);
+        }
+
+        .preview-digital {
+            background: linear-gradient(135deg, #faf8f3 0%, #e8e6e1 100%);
+        }
+
+        .preview-minimalist {
+            background: #FAFAFA;
+        }
+
+        .preview-3d {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+        }
+
+        .card-content {
+            padding: 30px;
+        }
+
+        .card-tag {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+        }
+
+        .card-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .features-list li {
+            padding: 6px 0;
+            color: #444;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .features-list li::before {
+            content: '✓';
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .card-link {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .card-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+            margin-top: 40px;
+        }
+
+        .footer-text {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .tech-badge {
+            padding: 8px 18px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .designs-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header {
+                margin-bottom: 40px;
+            }
+
+            .card-content {
+                padding: 20px;
+            }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translate(100px, -100px) scale(1.5);
+                opacity: 0.6;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles -->
+    <div class="particle" style="width: 4px; height: 4px; top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <div class="particle" style="width: 6px; height: 6px; top: 60%; left: 80%; animation-delay: 5s;"></div>
+    <div class="particle" style="width: 3px; height: 3px; top: 30%; left: 70%; animation-delay: 10s;"></div>
+    <div class="particle" style="width: 5px; height: 5px; top: 80%; left: 30%; animation-delay: 15s;"></div>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="main-title">📚 Book Page Designs Showcase</h1>
+            <p class="subtitle">
+                Explore five unique, future-ready book page designs — from futuristic holographic interfaces
+                to traditional vintage aesthetics, digital e-readers, modern minimalism, and immersive 3D experiences.
+            </p>
+        </header>
+
+        <div class="designs-grid">
+            <!-- Future-Ready Design -->
+            <div class="design-card">
+                <div class="card-preview preview-future">
+                    🚀
+                </div>
+                <div class="card-content">
+                    <span class="card-tag">Futuristic</span>
+                    <h2 class="card-title">Future-Ready</h2>
+                    <p class="card-description">
+                        A holographic, AI-enhanced reading experience with neural network backgrounds,
+                        particle effects, and voice control capabilities.
+                    </p>
+                    <ul class="features-list">
+                        <li>Holographic UI with neon effects</li>
+                        <li>AI assistant integration</li>
+                        <li>Neural network visualization</li>
+                        <li>Voice command support</li>
+                        <li>Interactive highlighting</li>
+                    </ul>
+                    <a href="future-ready.html" class="card-link">Explore Design →</a>
+                </div>
+            </div>
+
+            <!-- Traditional Design -->
+            <div class="design-card">
+                <div class="card-preview preview-traditional">
+                    📜
+                </div>
+                <div class="card-content">
+                    <span class="card-tag">Classic</span>
+                    <h2 class="card-title">Traditional</h2>
+                    <p class="card-description">
+                        Vintage book aesthetics with aged paper textures, ornamental borders,
+                        drop caps, and authentic page-turning animations.
+                    </p>
+                    <ul class="features-list">
+                        <li>Aged paper texture effect</li>
+                        <li>Decorative borders & ornaments</li>
+                        <li>Drop cap typography</li>
+                        <li>Two-column layout</li>
+                        <li>Interactive bookmark ribbon</li>
+                    </ul>
+                    <a href="traditional.html" class="card-link">Explore Design →</a>
+                </div>
+            </div>
+
+            <!-- Digital E-Reader Design -->
+            <div class="design-card">
+                <div class="card-preview preview-digital">
+                    📱
+                </div>
+                <div class="card-content">
+                    <span class="card-tag">Digital</span>
+                    <h2 class="card-title">Digital E-Reader</h2>
+                    <p class="card-description">
+                        Modern e-reader interface with customizable settings, night mode,
+                        highlighting tools, and built-in dictionary features.
+                    </p>
+                    <ul class="features-list">
+                        <li>Adjustable font & brightness</li>
+                        <li>Multiple theme modes</li>
+                        <li>Text highlighting tools</li>
+                        <li>Built-in dictionary popup</li>
+                        <li>Reading progress tracker</li>
+                    </ul>
+                    <a href="digital.html" class="card-link">Explore Design →</a>
+                </div>
+            </div>
+
+            <!-- Modern Minimalist Design -->
+            <div class="design-card">
+                <div class="card-preview preview-minimalist">
+                    ✨
+                </div>
+                <div class="card-content">
+                    <span class="card-tag">Minimalist</span>
+                    <h2 class="card-title">Modern Minimalist</h2>
+                    <p class="card-description">
+                        Clean, content-focused design with generous whitespace, beautiful typography,
+                        and subtle scroll animations for a distraction-free reading experience.
+                    </p>
+                    <ul class="features-list">
+                        <li>Ultra-clean typography</li>
+                        <li>Generous whitespace design</li>
+                        <li>Smooth scroll animations</li>
+                        <li>Navigation dot indicators</li>
+                        <li>Reading progress bar</li>
+                    </ul>
+                    <a href="modern-minimalist.html" class="card-link">Explore Design →</a>
+                </div>
+            </div>
+
+            <!-- 3D Interactive Design -->
+            <div class="design-card">
+                <div class="card-preview preview-3d">
+                    📖
+                </div>
+                <div class="card-content">
+                    <span class="card-tag">Interactive</span>
+                    <h2 class="card-title">3D Interactive</h2>
+                    <p class="card-description">
+                        Immersive 3D book with realistic page-turning effects, mouse-responsive tilting,
+                        and authentic physical book simulation.
+                    </p>
+                    <ul class="features-list">
+                        <li>Realistic 3D page flipping</li>
+                        <li>Mouse-responsive book tilt</li>
+                        <li>Physical book simulation</li>
+                        <li>Interactive page curl hints</li>
+                        <li>Multi-page story content</li>
+                    </ul>
+                    <a href="3d-interactive.html" class="card-link">Explore Design →</a>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p class="footer-text">
+                All designs are fully responsive and built with modern web technologies
+            </p>
+            <div class="tech-stack">
+                <span class="tech-badge">HTML5</span>
+                <span class="tech-badge">CSS3</span>
+                <span class="tech-badge">JavaScript</span>
+                <span class="tech-badge">Animations</span>
+                <span class="tech-badge">3D Transforms</span>
+                <span class="tech-badge">Responsive Design</span>
+            </div>
+            <p style="margin-top: 30px; opacity: 0.8; font-size: 0.9rem;">
+                Created with ❤️ for exploring the future of digital reading
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Add smooth scroll behavior
+        document.querySelectorAll('.card-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                // Optional: Add loading animation
+                console.log('Loading design:', link.href);
+            });
+        });
+
+        // Add parallax effect to cards on scroll
+        window.addEventListener('scroll', () => {
+            const cards = document.querySelectorAll('.design-card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const scrollPercent = (window.innerHeight - rect.top) / window.innerHeight;
+                if (scrollPercent > 0 && scrollPercent < 1) {
+                    card.style.transform = `translateY(${-scrollPercent * 10}px)`;
+                }
+            });
+        });
+
+        console.log('📚 Book Designs Showcase loaded!');
+        console.log('Available designs:');
+        console.log('1. Future-Ready - Holographic AI-enhanced experience');
+        console.log('2. Traditional - Vintage book aesthetics');
+        console.log('3. Digital E-Reader - Modern reading interface');
+        console.log('4. Modern Minimalist - Clean & focused design');
+        console.log('5. 3D Interactive - Immersive book experience');
+    </script>
+</body>
+</html>

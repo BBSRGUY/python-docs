@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital E-Reader</title>
+    <style>
+        :root {
+            --bg-color: #faf8f3;
+            --text-color: #2c2c2c;
+            --accent-color: #4a90e2;
+            --border-color: #ddd;
+            --highlight-color: rgba(255, 235, 59, 0.4);
+            --note-color: #ff9800;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        body.night-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --border-color: #333;
+        }
+
+        body.sepia-mode {
+            --bg-color: #f4ecd8;
+            --text-color: #5c4a3a;
+        }
+
+        /* Top Control Bar */
+        .control-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .control-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .control-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            padding: 0;
+        }
+
+        .book-info {
+            font-size: 0.9em;
+            color: var(--text-color);
+        }
+
+        .book-title-small {
+            font-weight: 600;
+        }
+
+        /* Reading Area */
+        .reading-container {
+            max-width: 800px;
+            margin: 80px auto 100px;
+            padding: 40px 30px;
+            min-height: calc(100vh - 180px);
+        }
+
+        .chapter-info {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .chapter-number {
+            font-size: 0.9em;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .chapter-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .reading-time {
+            font-size: 0.85em;
+            color: #888;
+        }
+
+        .content-area {
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+
+        .paragraph {
+            margin-bottom: 1.5em;
+            text-align: justify;
+            transition: all 0.3s;
+        }
+
+        .paragraph.highlighted {
+            background: var(--highlight-color);
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        .paragraph:hover {
+            background: rgba(74, 144, 226, 0.05);
+            padding: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        /* Note indicator */
+        .has-note {
+            position: relative;
+            border-left: 3px solid var(--note-color);
+            padding-left: 15px;
+        }
+
+        .note-icon {
+            position: absolute;
+            top: 0;
+            left: -15px;
+            background: var(--note-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            cursor: pointer;
+        }
+
+        /* Bottom Control Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+            padding: 15px 20px;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-container {
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-color);
+            transition: width 0.3s;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-btn {
+            padding: 10px 30px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .page-indicator {
+            font-size: 0.9em;
+            color: var(--text-color);
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 60px;
+            right: -350px;
+            width: 350px;
+            height: calc(100vh - 60px);
+            background: var(--bg-color);
+            border-left: 1px solid var(--border-color);
+            padding: 30px;
+            overflow-y: auto;
+            transition: right 0.3s;
+            z-index: 999;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .setting-group {
+            margin-bottom: 30px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            border: none;
+        }
+
+        .theme-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9em;
+        }
+
+        .theme-btn.active {
+            border-color: var(--accent-color);
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .font-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* Highlight Menu */
+        .highlight-menu {
+            position: absolute;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+        }
+
+        .highlight-menu.show {
+            display: flex;
+            gap: 10px;
+        }
+
+        .highlight-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .highlight-option:hover {
+            transform: scale(1.2);
+            border-color: #333;
+        }
+
+        .highlight-yellow { background: #ffeb3b; }
+        .highlight-green { background: #4caf50; }
+        .highlight-blue { background: #2196f3; }
+        .highlight-pink { background: #e91e63; }
+
+        /* Bookmark */
+        .bookmark-btn {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--bg-color);
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 998;
+        }
+
+        .bookmark-btn:hover {
+            background: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        .bookmark-btn.bookmarked {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* Dictionary Popup */
+        .dictionary-popup {
+            position: fixed;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 300px;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1002;
+        }
+
+        .dictionary-popup.show {
+            display: block;
+        }
+
+        .dictionary-word {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .dictionary-definition {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .reading-container {
+                padding: 30px 20px;
+            }
+
+            .chapter-title {
+                font-size: 1.8em;
+            }
+
+            .settings-panel {
+                width: 100%;
+                right: -100%;
+            }
+
+            .control-group .book-info {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Control Bar -->
+    <div class="control-bar">
+        <div class="control-group">
+            <button class="control-btn icon-btn" onclick="window.history.back()" title="Back">◄</button>
+            <div class="book-info">
+                <div class="book-title-small">The Digital Age</div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <button class="control-btn icon-btn" onclick="toggleSettings()" title="Settings">⚙</button>
+            <button class="control-btn icon-btn" onclick="toggleNightMode()" title="Night Mode" id="theme-toggle">🌙</button>
+            <button class="control-btn icon-btn" onclick="shareBook()" title="Share">↗</button>
+        </div>
+    </div>
+
+    <!-- Bookmark Button -->
+    <div class="bookmark-btn" id="bookmark-btn" onclick="toggleBookmark()" title="Bookmark this page">
+        🔖
+    </div>
+
+    <!-- Reading Area -->
+    <div class="reading-container" id="reading-container">
+        <div class="chapter-info">
+            <div class="chapter-number">Chapter 5</div>
+            <h1 class="chapter-title">The Evolution of Digital Reading</h1>
+            <div class="reading-time">⏱ 12 min read</div>
+        </div>
+
+        <div class="content-area" id="content-area">
+            <p class="paragraph">
+                The transition from physical books to digital reading devices marked one of the most
+                significant shifts in how humanity consumes written content. E-readers brought the
+                convenience of carrying thousands of books in a single, lightweight device, fundamentally
+                changing our relationship with reading.
+            </p>
+
+            <p class="paragraph">
+                Digital books offered features impossible with traditional print: adjustable font sizes
+                for accessibility, built-in dictionaries for instant word lookups, note-taking without
+                marking up precious pages, and the ability to search through entire libraries in seconds.
+                These innovations made reading more accessible and personalized than ever before.
+            </p>
+
+            <p class="paragraph has-note">
+                <span class="note-icon" onclick="showNote(this)">📝</span>
+                The environmental impact of digital reading remains a topic of debate. While e-readers
+                eliminate paper consumption, they require electronic manufacturing and eventual disposal.
+                Studies suggest that reading approximately 20-30 books on an e-reader can offset its
+                carbon footprint compared to physical books.
+            </p>
+
+            <p class="paragraph">
+                One of the most revolutionary aspects of digital reading is the synchronization across
+                devices. Readers can start a book on their tablet during breakfast, continue on their
+                phone during their commute, and finish on their computer at work, with all their
+                highlights and bookmarks seamlessly transferred.
+            </p>
+
+            <p class="paragraph">
+                The social aspect of reading has also evolved in the digital age. Readers can share
+                quotes instantly on social media, join online book clubs, and see popular highlights
+                from other readers. This creates a collective reading experience that transcends
+                geographical boundaries.
+            </p>
+
+            <p class="paragraph">
+                However, many readers report that they retain information better when reading physical
+                books. The tactile experience of turning pages, the visual memory of where information
+                appeared on a page, and the satisfaction of seeing progress through a physical stack
+                of pages all contribute to the reading experience in ways that digital formats struggle
+                to replicate.
+            </p>
+
+            <p class="paragraph">
+                The future of digital reading likely lies in augmented reality and interactive content.
+                Imagine textbooks where diagrams come to life in 3D, novels where you can explore the
+                settings in virtual reality, or educational materials that adapt in real-time to your
+                learning pace and comprehension level.
+            </p>
+
+            <p class="paragraph">
+                As technology continues to advance, the line between different media forms blurs.
+                Digital books can now incorporate videos, audio narration, interactive exercises, and
+                even gamification elements. This multimedia approach transforms reading from a passive
+                activity into an immersive, multi-sensory experience.
+            </p>
+        </div>
+    </div>
+
+    <!-- Bottom Control Bar -->
+    <div class="bottom-bar">
+        <div class="progress-container">
+            <div class="progress-bar" onclick="seekToPosition(event)">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-info">
+                <span id="current-page">Page 47 of 156</span>
+                <span id="time-remaining">32 min left in chapter</span>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" onclick="previousPage()">← Previous</button>
+            <div class="page-indicator">
+                <span id="percentage">30%</span>
+            </div>
+            <button class="nav-btn" onclick="nextPage()">Next →</button>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settings-panel">
+        <h2 style="margin-bottom: 25px;">Reading Settings</h2>
+
+        <div class="setting-group">
+            <label class="setting-label">Font Size</label>
+            <input type="range" min="12" max="24" value="18" class="slider" id="font-size-slider" oninput="changeFontSize(this.value)">
+            <div style="text-align: center; margin-top: 8px; color: #888;">
+                <span id="font-size-value">18px</span>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <label class="setting-label">Line Height</label>
+            <input type="range" min="1.2" max="2.4" step="0.1" value="1.8" class="slider" id="line-height-slider" oninput="changeLineHeight(this.value)">
+            <div style="text-align: center; margin-top: 8px; color: #888;">
+                <span id="line-height-value">1.8</span>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <label class="setting-label">Theme</label>
+            <div class="theme-options">
+                <button class="theme-btn active" onclick="setTheme('light')">☀️ Light</button>
+                <button class="theme-btn" onclick="setTheme('sepia')">📜 Sepia</button>
+                <button class="theme-btn" onclick="setTheme('night')">🌙 Night</button>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <label class="setting-label">Font Family</label>
+            <div class="font-options">
+                <button class="theme-btn active" onclick="setFont('system')">System</button>
+                <button class="theme-btn" onclick="setFont('serif')">Serif</button>
+                <button class="theme-btn" onclick="setFont('mono')">Mono</button>
+                <button class="theme-btn" onclick="setFont('dyslexic')">Dyslexic</button>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <label class="setting-label">Brightness</label>
+            <input type="range" min="50" max="100" value="100" class="slider" id="brightness-slider" oninput="changeBrightness(this.value)">
+            <div style="text-align: center; margin-top: 8px; color: #888;">
+                <span id="brightness-value">100%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Highlight Menu -->
+    <div class="highlight-menu" id="highlight-menu">
+        <div class="highlight-option highlight-yellow" onclick="highlightSelection('yellow')" title="Yellow"></div>
+        <div class="highlight-option highlight-green" onclick="highlightSelection('green')" title="Green"></div>
+        <div class="highlight-option highlight-blue" onclick="highlightSelection('blue')" title="Blue"></div>
+        <div class="highlight-option highlight-pink" onclick="highlightSelection('pink')" title="Pink"></div>
+    </div>
+
+    <!-- Dictionary Popup -->
+    <div class="dictionary-popup" id="dictionary-popup">
+        <div class="dictionary-word" id="dict-word"></div>
+        <div class="dictionary-definition" id="dict-definition"></div>
+    </div>
+
+    <script>
+        let currentProgress = 30;
+        let isBookmarked = false;
+        let settingsOpen = false;
+
+        // Initialize
+        updateProgress();
+
+        function updateProgress() {
+            document.getElementById('progress-fill').style.width = currentProgress + '%';
+            document.getElementById('percentage').textContent = currentProgress + '%';
+        }
+
+        function nextPage() {
+            if (currentProgress < 100) {
+                currentProgress += 5;
+                updateProgress();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function previousPage() {
+            if (currentProgress > 0) {
+                currentProgress -= 5;
+                updateProgress();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function seekToPosition(event) {
+            const bar = event.currentTarget;
+            const rect = bar.getBoundingClientRect();
+            const percentage = ((event.clientX - rect.left) / rect.width) * 100;
+            currentProgress = Math.round(percentage);
+            updateProgress();
+        }
+
+        function toggleSettings() {
+            settingsOpen = !settingsOpen;
+            document.getElementById('settings-panel').classList.toggle('open', settingsOpen);
+        }
+
+        function toggleNightMode() {
+            const body = document.body;
+            const themeToggle = document.getElementById('theme-toggle');
+
+            if (body.classList.contains('night-mode')) {
+                body.classList.remove('night-mode');
+                themeToggle.textContent = '🌙';
+            } else {
+                body.classList.remove('sepia-mode');
+                body.classList.add('night-mode');
+                themeToggle.textContent = '☀️';
+            }
+        }
+
+        function setTheme(theme) {
+            const body = document.body;
+            const themeButtons = document.querySelectorAll('.theme-btn');
+
+            themeButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            body.classList.remove('night-mode', 'sepia-mode');
+
+            if (theme === 'night') {
+                body.classList.add('night-mode');
+            } else if (theme === 'sepia') {
+                body.classList.add('sepia-mode');
+            }
+        }
+
+        function changeFontSize(value) {
+            document.getElementById('content-area').style.fontSize = value + 'px';
+            document.getElementById('font-size-value').textContent = value + 'px';
+        }
+
+        function changeLineHeight(value) {
+            document.getElementById('content-area').style.lineHeight = value;
+            document.getElementById('line-height-value').textContent = value;
+        }
+
+        function changeBrightness(value) {
+            document.body.style.filter = `brightness(${value}%)`;
+            document.getElementById('brightness-value').textContent = value + '%';
+        }
+
+        function setFont(font) {
+            const contentArea = document.getElementById('content-area');
+            const fontButtons = event.target.parentElement.querySelectorAll('.theme-btn');
+
+            fontButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const fonts = {
+                'system': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                'serif': 'Georgia, "Times New Roman", serif',
+                'mono': '"Courier New", Courier, monospace',
+                'dyslexic': 'Arial, Helvetica, sans-serif'
+            };
+
+            contentArea.style.fontFamily = fonts[font];
+        }
+
+        function toggleBookmark() {
+            isBookmarked = !isBookmarked;
+            const bookmarkBtn = document.getElementById('bookmark-btn');
+            bookmarkBtn.classList.toggle('bookmarked', isBookmarked);
+
+            if (isBookmarked) {
+                alert('📑 Page bookmarked!');
+            }
+        }
+
+        function shareBook() {
+            alert('📤 Share options:\n\n• Copy link\n• Share to social media\n• Send to device\n• Email');
+        }
+
+        function showNote(element) {
+            alert('📝 Your note:\n\n"This is important for understanding the environmental trade-offs between digital and physical reading."');
+        }
+
+        // Text selection for highlighting
+        document.getElementById('content-area').addEventListener('mouseup', function(e) {
+            const selection = window.getSelection();
+            const text = selection.toString().trim();
+
+            if (text.length > 0) {
+                const menu = document.getElementById('highlight-menu');
+                menu.classList.add('show');
+                menu.style.left = e.pageX + 'px';
+                menu.style.top = (e.pageY - 50) + 'px';
+            }
+        });
+
+        // Close highlight menu when clicking elsewhere
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.highlight-menu') && !e.target.closest('.paragraph')) {
+                document.getElementById('highlight-menu').classList.remove('show');
+            }
+        });
+
+        function highlightSelection(color) {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const span = document.createElement('span');
+                span.style.background = getComputedStyle(document.querySelector('.highlight-' + color)).background;
+                span.style.padding = '2px 4px';
+                span.style.borderRadius = '3px';
+
+                try {
+                    range.surroundContents(span);
+                } catch (e) {
+                    console.log('Selection spans multiple elements');
+                }
+            }
+
+            document.getElementById('highlight-menu').classList.remove('show');
+            window.getSelection().removeAllRanges();
+        }
+
+        // Double-click word for dictionary
+        document.getElementById('content-area').addEventListener('dblclick', function(e) {
+            if (e.target.closest('.paragraph')) {
+                const selection = window.getSelection();
+                const word = selection.toString().trim();
+
+                if (word) {
+                    showDictionary(word, e.pageX, e.pageY);
+                }
+            }
+        });
+
+        function showDictionary(word, x, y) {
+            const definitions = {
+                'transition': 'The process of changing from one state to another.',
+                'significant': 'Sufficiently great or important to be worthy of attention.',
+                'accessibility': 'The quality of being able to be reached or entered.',
+                'environmental': 'Relating to the natural world and the impact of human activity.',
+                'synchronization': 'The operation or activity of two or more things at the same time.',
+                'augmented': 'Having been made greater in size or value.'
+            };
+
+            const popup = document.getElementById('dictionary-popup');
+            const definition = definitions[word.toLowerCase()] || 'Definition not available in built-in dictionary. Tap to search online.';
+
+            document.getElementById('dict-word').textContent = word;
+            document.getElementById('dict-definition').textContent = definition;
+
+            popup.classList.add('show');
+            popup.style.left = x + 'px';
+            popup.style.top = (y + 20) + 'px';
+
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 5000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'ArrowLeft') previousPage();
+            if (e.key === 'n' && e.ctrlKey) toggleNightMode();
+            if (e.key === 'b' && e.ctrlKey) {
+                e.preventDefault();
+                toggleBookmark();
+            }
+        });
+
+        console.log('📱 Digital E-Reader loaded - Use arrow keys to navigate, Ctrl+N for night mode, Ctrl+B to bookmark');
+    </script>
+</body>
+</html>

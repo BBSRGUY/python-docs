@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traditional Book Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Garamond', serif;
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f08 100%);
+            color: #3d2817;
+            min-height: 100vh;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(101, 67, 33, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .book-container {
+            max-width: 900px;
+            margin: 0 auto;
+            perspective: 2000px;
+        }
+
+        .book-wrapper {
+            position: relative;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .page {
+            background: linear-gradient(135deg, #f4e4c1 0%, #e8d5b0 100%);
+            padding: 60px;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.4),
+                inset 0 0 100px rgba(101, 67, 33, 0.1);
+            position: relative;
+            border-radius: 3px;
+        }
+
+        /* Paper texture */
+        .page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(139, 69, 19, 0.03) 0px,
+                    transparent 1px,
+                    transparent 2px,
+                    rgba(139, 69, 19, 0.03) 3px
+                );
+            pointer-events: none;
+            border-radius: 3px;
+        }
+
+        /* Book binding shadow */
+        .page::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 30px;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.2) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .decorative-border {
+            border: 3px double #8b4513;
+            padding: 40px;
+            position: relative;
+        }
+
+        .decorative-border::before,
+        .decorative-border::after {
+            content: '❦';
+            position: absolute;
+            font-size: 2em;
+            color: #8b4513;
+        }
+
+        .decorative-border::before {
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .decorative-border::after {
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%) rotate(180deg);
+        }
+
+        .corner-ornament {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 2px solid #8b4513;
+        }
+
+        .corner-ornament.top-left {
+            top: -2px;
+            left: -2px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-ornament.top-right {
+            top: -2px;
+            right: -2px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner-ornament.bottom-left {
+            bottom: -2px;
+            left: -2px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner-ornament.bottom-right {
+            bottom: -2px;
+            right: -2px;
+            border-left: none;
+            border-top: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #8b4513;
+            padding-bottom: 20px;
+        }
+
+        .book-title {
+            font-size: 2.8em;
+            font-weight: normal;
+            font-variant: small-caps;
+            letter-spacing: 3px;
+            color: #5d3a1a;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+
+        .author {
+            font-size: 1.2em;
+            font-style: italic;
+            color: #6b4423;
+            letter-spacing: 1px;
+        }
+
+        .chapter-header {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .chapter-number {
+            font-size: 1em;
+            font-variant: small-caps;
+            letter-spacing: 2px;
+            color: #8b4513;
+            margin-bottom: 5px;
+        }
+
+        .chapter-title {
+            font-size: 2em;
+            font-weight: normal;
+            color: #5d3a1a;
+            margin-bottom: 20px;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            color: #8b4513;
+            font-size: 1.5em;
+        }
+
+        .content {
+            column-count: 2;
+            column-gap: 40px;
+            column-rule: 1px solid rgba(139, 69, 19, 0.2);
+            text-align: justify;
+            hyphens: auto;
+        }
+
+        .drop-cap::first-letter {
+            float: left;
+            font-size: 5em;
+            line-height: 0.8;
+            margin: 10px 10px 0 0;
+            font-weight: bold;
+            color: #8b4513;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .paragraph {
+            margin-bottom: 20px;
+            line-height: 1.8;
+            text-indent: 2em;
+            font-size: 1.05em;
+            color: #3d2817;
+        }
+
+        .paragraph:first-of-type {
+            text-indent: 0;
+        }
+
+        .quote {
+            font-style: italic;
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            border-top: 1px solid #8b4513;
+            border-bottom: 1px solid #8b4513;
+            position: relative;
+            column-span: all;
+        }
+
+        .quote::before,
+        .quote::after {
+            content: '"';
+            font-size: 3em;
+            color: #8b4513;
+            opacity: 0.3;
+        }
+
+        .quote::before {
+            position: absolute;
+            left: 20px;
+            top: 0;
+        }
+
+        .quote::after {
+            position: absolute;
+            right: 20px;
+            bottom: -20px;
+        }
+
+        .illuminated-letter {
+            position: relative;
+            display: inline-block;
+        }
+
+        .footnote {
+            font-size: 0.85em;
+            color: #6b4423;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(139, 69, 19, 0.3);
+            column-span: all;
+        }
+
+        .page-number {
+            text-align: center;
+            margin-top: 40px;
+            font-style: italic;
+            color: #8b4513;
+            font-size: 0.9em;
+            column-span: all;
+        }
+
+        .bookmark {
+            position: absolute;
+            top: -10px;
+            right: 100px;
+            width: 40px;
+            height: 80px;
+            background: linear-gradient(135deg, #8b0000 0%, #dc143c 100%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .bookmark::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 15px;
+            background: linear-gradient(135deg, #8b0000 0%, #dc143c 100%);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+        }
+
+        .bookmark:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .page-turn-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding: 0 20px;
+        }
+
+        .page-btn {
+            background: #8b4513;
+            color: #f4e4c1;
+            border: none;
+            padding: 12px 30px;
+            font-family: 'Georgia', serif;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 3px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover {
+            background: #654321;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .page-btn:active {
+            transform: translateY(0);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Page flip animation */
+        @keyframes page-flip {
+            0% {
+                transform: rotateY(0deg);
+            }
+            50% {
+                transform: rotateY(-90deg);
+            }
+            100% {
+                transform: rotateY(0deg);
+            }
+        }
+
+        .page-flipping {
+            animation: page-flip 1s ease-in-out;
+        }
+
+        /* Aged paper effect on hover */
+        .page:hover {
+            box-shadow:
+                0 15px 50px rgba(0, 0, 0, 0.5),
+                inset 0 0 120px rgba(101, 67, 33, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .page {
+                padding: 30px;
+            }
+
+            .decorative-border {
+                padding: 20px;
+            }
+
+            .content {
+                column-count: 1;
+            }
+
+            .book-title {
+                font-size: 2em;
+            }
+
+            .chapter-title {
+                font-size: 1.5em;
+            }
+
+            .drop-cap::first-letter {
+                font-size: 3.5em;
+            }
+        }
+
+        /* Candle flicker effect */
+        @keyframes candle-flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.95; }
+        }
+
+        body {
+            animation: candle-flicker 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="book-container">
+        <div class="bookmark" onclick="alert('Bookmark saved at page 47')" title="Click to bookmark"></div>
+
+        <div class="book-wrapper" id="book-wrapper">
+            <div class="page">
+                <div class="decorative-border">
+                    <div class="corner-ornament top-left"></div>
+                    <div class="corner-ornament top-right"></div>
+                    <div class="corner-ornament bottom-left"></div>
+                    <div class="corner-ornament bottom-right"></div>
+
+                    <div class="header">
+                        <h1 class="book-title">Tales of Ancient Wisdom</h1>
+                        <p class="author">by Eleanor Blackwood</p>
+                    </div>
+
+                    <div class="chapter-header">
+                        <div class="chapter-number">Chapter III</div>
+                        <h2 class="chapter-title">The Keeper of Stories</h2>
+                        <div class="divider">⚜ ❦ ⚜</div>
+                    </div>
+
+                    <div class="content">
+                        <p class="paragraph drop-cap">
+                            In the heart of the forgotten library, where dust motes danced in shafts
+                            of golden afternoon light, old Master Thornbury kept his eternal vigil among
+                            the leather-bound volumes. His gnarled fingers, weathered by seven decades
+                            of turning pages, moved with practiced reverence across the ancient texts
+                            that lined the towering shelves.
+                        </p>
+
+                        <p class="paragraph">
+                            The library itself was a monument to the written word, its Gothic arches
+                            reaching toward heaven as if in prayer to the gods of knowledge. Each book
+                            held within its pages the whispers of generations past, their wisdom
+                            carefully preserved in ink and parchment for those who would come seeking
+                            understanding.
+                        </p>
+
+                        <div class="quote">
+                            "A book is a garden carried in the pocket, a friend who waits patiently
+                            upon the shelf, and a window into worlds beyond our mortal reach."
+                        </div>
+
+                        <p class="paragraph">
+                            Master Thornbury often spoke of the sacred duty of the keeper—not merely
+                            to preserve the books, but to ensure their stories found their way to
+                            those who needed them most. He believed that books chose their readers as
+                            much as readers chose their books, a mystical connection formed across
+                            time and space.
+                        </p>
+
+                        <p class="paragraph">
+                            On this particular autumn evening, as the setting sun painted the stained
+                            glass windows in hues of amber and crimson, a young scholar arrived seeking
+                            knowledge of the old ways. Master Thornbury smiled knowingly, for he had
+                            been expecting this visitor, though they had never met.
+                        </p>
+
+                        <p class="paragraph">
+                            "The books have been whispering your name," he said, his voice like the
+                            rustling of ancient pages. "Come, let me show you the volume that has been
+                            waiting these many years for your arrival."
+                        </p>
+
+                        <p class="paragraph">
+                            He led the way through corridors lined with countless tomes, past
+                            manuscripts illuminated by monks in candlelit monasteries, past first
+                            editions signed by authors long deceased, past collections so rare that
+                            merely touching them felt like reaching across centuries.
+                        </p>
+
+                        <p class="paragraph">
+                            At last, they arrived at a small alcove where a single book rested upon
+                            a velvet cushion, its leather cover worn smooth by countless hands. The
+                            young scholar reached out, and as their fingers touched the binding, they
+                            felt a surge of recognition, as though reuniting with an old friend.
+                        </p>
+
+                        <div class="footnote">
+                            ¹ The Great Library of Alexandria, though lost to fire, lived on in the
+                            countless smaller libraries established by those who had studied within
+                            its halls. Master Thornbury's library was rumored to house several volumes
+                            saved from that ancient conflagration.
+                        </div>
+                    </div>
+
+                    <div class="page-number">~ 47 ~</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-turn-controls">
+            <button class="page-btn" id="prev-btn" onclick="turnPage('prev')">⟨ Previous</button>
+            <button class="page-btn" id="next-btn" onclick="turnPage('next')">Next ⟩</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 3;
+
+        const pageContent = {
+            1: {
+                chapterNum: "Chapter III",
+                chapterTitle: "The Keeper of Stories",
+                content: `The current content loaded in the page...`
+            },
+            2: {
+                chapterNum: "Chapter III (continued)",
+                chapterTitle: "The Keeper of Stories",
+                content: `The young scholar opened the book with trembling hands, and the words seemed to glow faintly in the dimming light. Each sentence revealed truths they had been searching for, answers to questions they hadn't yet learned to ask. Master Thornbury watched with satisfaction, knowing that once again, the ancient magic of storytelling had found its mark.`
+            },
+            3: {
+                chapterNum: "Chapter IV",
+                chapterTitle: "The Awakening",
+                content: `As dawn broke over the library, the young scholar emerged transformed. The night spent with the ancient tome had not merely provided knowledge—it had awakened something deep within their soul. They now understood what Master Thornbury had meant about books choosing their readers.`
+            }
+        };
+
+        function turnPage(direction) {
+            const bookWrapper = document.getElementById('book-wrapper');
+            bookWrapper.classList.add('page-flipping');
+
+            setTimeout(() => {
+                if (direction === 'next' && currentPage < totalPages) {
+                    currentPage++;
+                } else if (direction === 'prev' && currentPage > 1) {
+                    currentPage--;
+                }
+
+                updatePageButtons();
+                bookWrapper.classList.remove('page-flipping');
+
+                // Play page turn sound effect (simulated)
+                console.log('🔊 Page turn sound');
+            }, 500);
+        }
+
+        function updatePageButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+        }
+
+        // Simulate random page flutter effect
+        function pageFlutter() {
+            const page = document.querySelector('.page');
+            const intensity = Math.random() * 2;
+            page.style.transform = `translateY(${intensity}px)`;
+
+            setTimeout(() => {
+                page.style.transform = 'translateY(0)';
+            }, 100);
+        }
+
+        // Add subtle page movement every few seconds
+        setInterval(pageFlutter, 8000);
+
+        // Bookmark interaction
+        document.querySelector('.bookmark').addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+
+        document.querySelector('.bookmark').addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+
+        // Add reading progress tracking
+        let readingTime = 0;
+        setInterval(() => {
+            readingTime++;
+            console.log(`📖 Reading time: ${readingTime} seconds`);
+        }, 1000);
+
+        // Initialize
+        updatePageButtons();
+
+        // Add hover effect to paragraphs
+        document.querySelectorAll('.paragraph').forEach(p => {
+            p.addEventListener('mouseenter', function() {
+                this.style.color = '#2d1810';
+                this.style.transition = 'color 0.3s';
+            });
+
+            p.addEventListener('mouseleave', function() {
+                this.style.color = '#3d2817';
+            });
+        });
+
+        console.log('📚 Traditional Book Page Loaded - Enjoy your reading experience');
+    </script>
+</body>
+</html>
