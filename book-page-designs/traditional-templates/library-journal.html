@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Quarterly Review - Library Journal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Baskerville', 'Garamond', 'Georgia', serif;
+            background: linear-gradient(135deg, #2c1810 0%, #1a0e08 100%);
+            color: #2a2420;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .journal-page {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #faf8f0;
+            padding: 0;
+            box-shadow:
+                0 0 0 1px #8b7355,
+                0 0 0 10px #e8e3d8,
+                0 0 0 11px #8b7355,
+                0 30px 80px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        /* Aged paper texture */
+        .journal-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(139, 115, 85, 0.02) 2px,
+                    rgba(139, 115, 85, 0.02) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(139, 115, 85, 0.02) 2px,
+                    rgba(139, 115, 85, 0.02) 4px
+                );
+            pointer-events: none;
+        }
+
+        /* Content wrapper */
+        .content-wrapper {
+            padding: 70px 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Journal header */
+        .journal-header {
+            text-align: center;
+            padding-bottom: 40px;
+            margin-bottom: 40px;
+            border-bottom: 3px double #6a5a4a;
+        }
+
+        .journal-name {
+            font-size: 2.2em;
+            font-weight: normal;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            margin-bottom: 10px;
+            font-variant: small-caps;
+            color: #3a2a1a;
+        }
+
+        .journal-info {
+            font-size: 0.85em;
+            color: #6a5a4a;
+            letter-spacing: 2px;
+            margin-top: 15px;
+        }
+
+        .volume-info {
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        /* Article header */
+        .article-header {
+            margin-bottom: 40px;
+        }
+
+        .article-title {
+            font-size: 2.2em;
+            font-weight: normal;
+            line-height: 1.3;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #2a2420;
+        }
+
+        .article-subtitle {
+            font-size: 1.3em;
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #5a4a3a;
+        }
+
+        .article-meta {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid #c8b896;
+            border-bottom: 1px solid #c8b896;
+            margin-bottom: 40px;
+        }
+
+        .author-name {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #3a2a1a;
+            margin-bottom: 5px;
+        }
+
+        .author-affiliation {
+            font-size: 0.9em;
+            font-style: italic;
+            color: #6a5a4a;
+        }
+
+        .publication-date {
+            font-size: 0.85em;
+            color: #8a7a6a;
+            margin-top: 10px;
+        }
+
+        /* Abstract */
+        .abstract {
+            background: rgba(200, 184, 150, 0.15);
+            border-left: 4px solid #8b7355;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .abstract-heading {
+            font-size: 1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            color: #3a2a1a;
+        }
+
+        .abstract-text {
+            font-size: 0.95em;
+            line-height: 1.8;
+            text-align: justify;
+            color: #4a3a2a;
+        }
+
+        /* Main text */
+        .article-body {
+            font-size: 1.05em;
+            line-height: 1.9;
+            text-align: justify;
+            hyphens: auto;
+        }
+
+        .section-heading {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin: 40px 0 20px;
+            color: #3a2a1a;
+            border-bottom: 2px solid #c8b896;
+            padding-bottom: 8px;
+        }
+
+        .subsection-heading {
+            font-size: 1.15em;
+            font-weight: 600;
+            font-style: italic;
+            margin: 30px 0 15px;
+            color: #4a3a2a;
+        }
+
+        .paragraph {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+        }
+
+        .paragraph.no-indent {
+            text-indent: 0;
+        }
+
+        /* Citations and references */
+        .citation {
+            font-size: 0.85em;
+            vertical-align: super;
+            color: #6a5a4a;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .citation:hover {
+            color: #3a2a1a;
+            text-decoration: underline;
+        }
+
+        /* Footnotes */
+        .footnotes-section {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #8b7355;
+            font-size: 0.9em;
+        }
+
+        .footnotes-heading {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: #3a2a1a;
+        }
+
+        .footnote-item {
+            margin-bottom: 12px;
+            display: flex;
+            gap: 10px;
+            line-height: 1.6;
+        }
+
+        .footnote-number {
+            color: #6a5a4a;
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+
+        .footnote-text {
+            color: #5a4a3a;
+        }
+
+        /* Block quotes */
+        .block-quote {
+            margin: 30px 0;
+            padding: 20px 40px;
+            border-left: 3px solid #8b7355;
+            border-right: 3px solid #8b7355;
+            background: rgba(200, 184, 150, 0.08);
+            font-style: italic;
+        }
+
+        .block-quote-text {
+            line-height: 1.8;
+            color: #4a3a2a;
+        }
+
+        .block-quote-attribution {
+            text-align: right;
+            margin-top: 15px;
+            font-size: 0.95em;
+            color: #6a5a4a;
+        }
+
+        /* Table styling */
+        .table-container {
+            margin: 30px 0;
+            overflow-x: auto;
+        }
+
+        .scholarly-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        .scholarly-table caption {
+            caption-side: top;
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            color: #3a2a1a;
+        }
+
+        .scholarly-table th {
+            background: rgba(139, 115, 85, 0.15);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #8b7355;
+            color: #3a2a1a;
+        }
+
+        .scholarly-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #c8b896;
+            color: #4a3a2a;
+        }
+
+        .table-note {
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 10px;
+            color: #6a5a4a;
+        }
+
+        /* Bibliography */
+        .bibliography {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 3px double #8b7355;
+        }
+
+        .bibliography-heading {
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #3a2a1a;
+        }
+
+        .bibliography-entry {
+            margin-bottom: 15px;
+            text-indent: -2em;
+            padding-left: 2em;
+            line-height: 1.6;
+            font-size: 0.95em;
+            color: #4a3a2a;
+        }
+
+        /* Page numbers */
+        .page-footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #8b7355;
+            text-align: center;
+            font-size: 0.9em;
+            color: #6a5a4a;
+        }
+
+        .page-number {
+            font-weight: bold;
+        }
+
+        /* Running header */
+        .running-header {
+            position: sticky;
+            top: 0;
+            background: #faf8f0;
+            padding: 15px 0;
+            border-bottom: 1px solid #c8b896;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #6a5a4a;
+            z-index: 10;
+            font-variant: small-caps;
+        }
+
+        .header-left {
+            font-style: italic;
+        }
+
+        .header-right {
+            font-weight: 600;
+        }
+
+        /* Emphasis */
+        .emphasis {
+            font-style: italic;
+        }
+
+        .strong-emphasis {
+            font-weight: 600;
+        }
+
+        /* Margin notes */
+        .margin-note {
+            float: right;
+            width: 150px;
+            margin: 0 -170px 20px 20px;
+            font-size: 0.75em;
+            line-height: 1.4;
+            color: #6a5a4a;
+            border-left: 2px solid #c8b896;
+            padding-left: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 50px 40px;
+            }
+
+            .journal-name {
+                font-size: 1.8em;
+            }
+
+            .article-title {
+                font-size: 1.8em;
+            }
+
+            .margin-note {
+                float: none;
+                width: 100%;
+                margin: 20px 0;
+                padding: 15px;
+                background: rgba(200, 184, 150, 0.1);
+                border-left: 3px solid #8b7355;
+            }
+
+            .running-header {
+                flex-direction: column;
+                gap: 5px;
+                text-align: center;
+            }
+        }
+
+        /* Hover effects */
+        .paragraph:hover {
+            background: rgba(200, 184, 150, 0.08);
+            margin-left: -5px;
+            margin-right: -5px;
+            padding: 5px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="journal-page">
+        <div class="running-header">
+            <span class="header-left">The Quarterly Review</span>
+            <span class="header-right">Vol. LXXIII, Autumn 1923</span>
+        </div>
+
+        <div class="content-wrapper">
+            <header class="journal-header">
+                <h1 class="journal-name">The Quarterly Review</h1>
+                <div class="journal-info">
+                    A Journal of Scholarly Inquiry and Academic Discourse
+                </div>
+                <div class="volume-info">
+                    Volume LXXIII • Number III • Autumn 1923
+                </div>
+            </header>
+
+            <article>
+                <div class="article-header">
+                    <h2 class="article-title">
+                        The Evolution of Literary Criticism in the Long Nineteenth Century
+                    </h2>
+                    <p class="article-subtitle">
+                        A Reassessment of Critical Methodologies and Interpretive Frameworks
+                    </p>
+
+                    <div class="article-meta">
+                        <div class="author-name">Dr. Jonathan P. Whitmore, D.Phil.</div>
+                        <div class="author-affiliation">
+                            Fellow, Wadham College, Oxford<br/>
+                            Professor of English Literature
+                        </div>
+                        <div class="publication-date">
+                            Received 15 June 1923 • Accepted 20 August 1923
+                        </div>
+                    </div>
+                </div>
+
+                <div class="abstract">
+                    <div class="abstract-heading">Abstract</div>
+                    <p class="abstract-text">
+                        This paper examines the development of literary critical theory from the late
+                        eighteenth century through the early twentieth century, with particular attention
+                        to the shifting paradigms that have shaped contemporary interpretive practices.
+                        Drawing upon primary sources and recent scholarship, the study traces the
+                        evolution of critical methodologies from Romantic aesthetics through Victorian
+                        moral criticism to modern formalist approaches. The analysis demonstrates that
+                        contemporary critical practice represents not a radical departure from, but
+                        rather a synthesis and refinement of, earlier theoretical frameworks.
+                    </p>
+                </div>
+
+                <div class="article-body">
+                    <h3 class="section-heading">I. Introduction</h3>
+
+                    <p class="paragraph no-indent">
+                        The history of literary criticism in the period extending from approximately
+                        1780 to 1920—the so-called "long nineteenth century"—reveals a remarkable
+                        progression of theoretical developments that continue to inform contemporary
+                        scholarly practice.<span class="citation">¹</span> This epoch witnessed the
+                        emergence of criticism as a distinct intellectual discipline, separate from
+                        but intimately related to both creative literature and philosophical inquiry.
+                    </p>
+
+                    <span class="margin-note">
+                        The term "long nineteenth century" was popularized by Hobsbawm (1962) to
+                        denote the period from 1789 to 1914.
+                    </span>
+
+                    <p class="paragraph">
+                        The transformation of critical discourse during this period cannot be understood
+                        in isolation from broader cultural and intellectual movements. The rise of
+                        <span class="emphasis">Romanticism</span>, with its emphasis upon imagination,
+                        individual genius, and organic form, fundamentally altered the terms of critical
+                        debate.<span class="citation">²</span> Where eighteenth-century criticism had
+                        concerned itself primarily with questions of <span class="emphasis">decorum</span>
+                        and adherence to classical models, Romantic critics such as Coleridge and
+                        Wordsworth sought to articulate new principles grounded in psychological and
+                        philosophical investigation.
+                    </p>
+
+                    <h4 class="subsection-heading">The Romantic Foundation</h4>
+
+                    <p class="paragraph">
+                        Samuel Taylor Coleridge's distinction between <span class="emphasis">Fancy</span>
+                        and <span class="emphasis">Imagination</span>, as elaborated in the
+                        <span class="emphasis">Biographia Literaria</span> (1817), exemplifies the
+                        Romantic critical project.<span class="citation">³</span> For Coleridge, the
+                        imagination was not merely a faculty for combining existing images, but rather
+                        a vital, creative power capable of perceiving and expressing fundamental truths
+                        about reality.
+                    </p>
+
+                    <div class="block-quote">
+                        <p class="block-quote-text">
+                            "The Imagination then I consider either as primary, or secondary. The primary
+                            Imagination I hold to be the living Power and prime Agent of all human
+                            Perception, and as a repetition in the finite mind of the eternal act of
+                            creation in the infinite I AM."
+                        </p>
+                        <p class="block-quote-attribution">
+                            — Coleridge, <em>Biographia Literaria</em>, Chapter XIII
+                        </p>
+                    </div>
+
+                    <p class="paragraph">
+                        This philosophical foundation proved enormously influential, establishing
+                        premises that would resonate throughout the century and beyond. The notion
+                        that poetry embodied a distinctive mode of knowledge, rather than merely
+                        providing pleasure or moral instruction, opened new avenues for critical
+                        investigation.
+                    </p>
+
+                    <h3 class="section-heading">II. Victorian Moral Criticism</h3>
+
+                    <p class="paragraph no-indent">
+                        The Victorian period witnessed a turn toward what might be termed <span class="strong-emphasis">
+                        moral criticism</span>—an approach that evaluated literature primarily in terms
+                        of its ethical content and social impact.<span class="citation">⁴</span> Critics
+                        such as Matthew Arnold sought to position literature as a substitute for
+                        traditional religious belief, arguing that poetry could provide moral guidance
+                        in an age of increasing doubt.
+                    </p>
+
+                    <p class="paragraph">
+                        Arnold's famous formulation in "The Study of Poetry" (1880) that poetry represents
+                        "a criticism of life" encapsulates this ethical orientation.<span class="citation">⁵</span>
+                        For Arnold, the question was not merely whether a work demonstrated technical
+                        proficiency or imaginative power, but whether it manifested "high seriousness"
+                        and contributed to the moral and cultural elevation of society.
+                    </p>
+
+                    <div class="table-container">
+                        <table class="scholarly-table">
+                            <caption>Table 1: Major Critical Movements, 1780-1920</caption>
+                            <thead>
+                                <tr>
+                                    <th>Period</th>
+                                    <th>Movement</th>
+                                    <th>Key Figures</th>
+                                    <th>Primary Concerns</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1780-1830</td>
+                                    <td>Romantic Criticism</td>
+                                    <td>Coleridge, Wordsworth, Hazlitt</td>
+                                    <td>Imagination, Genius, Organic Form</td>
+                                </tr>
+                                <tr>
+                                    <td>1830-1880</td>
+                                    <td>Victorian Criticism</td>
+                                    <td>Arnold, Ruskin, Carlyle</td>
+                                    <td>Moral Purpose, Cultural Authority</td>
+                                </tr>
+                                <tr>
+                                    <td>1880-1920</td>
+                                    <td>Early Modernism</td>
+                                    <td>Pater, Wilde, Eliot</td>
+                                    <td>Aesthetic Autonomy, Form</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="table-note">
+                            Note: Periodization necessarily involves simplification; these movements overlap
+                            considerably and contain significant internal variation.
+                        </p>
+                    </div>
+
+                    <h3 class="section-heading">III. Conclusion</h3>
+
+                    <p class="paragraph no-indent">
+                        The trajectory traced in this study reveals that contemporary critical practice
+                        remains deeply indebted to the theoretical innovations of the long nineteenth
+                        century. Whether we recognize it explicitly or not, our interpretive assumptions
+                        and methodological preferences bear the imprint of this formative period.
+                    </p>
+
+                    <p class="paragraph">
+                        Further research might profitably explore the transnational dimensions of these
+                        developments, examining how critical discourse in Britain intersected with parallel
+                        movements in Continental Europe and North America. Such investigation would
+                        undoubtedly complicate and enrich our understanding of this crucial epoch in the
+                        history of literary studies.
+                    </p>
+                </div>
+
+                <div class="footnotes-section">
+                    <div class="footnotes-heading">Notes</div>
+
+                    <div class="footnote-item">
+                        <span class="footnote-number">1.</span>
+                        <span class="footnote-text">
+                            See Wellek, René, <em>A History of Modern Criticism: 1750-1950</em>, 4 vols.
+                            (New Haven: Yale University Press, 1955-1965).
+                        </span>
+                    </div>
+
+                    <div class="footnote-item">
+                        <span class="footnote-number">2.</span>
+                        <span class="footnote-text">
+                            Abrams, M.H., <em>The Mirror and the Lamp: Romantic Theory and the Critical
+                            Tradition</em> (New York: Oxford University Press, 1953), pp. 21-26.
+                        </span>
+                    </div>
+
+                    <div class="footnote-item">
+                        <span class="footnote-number">3.</span>
+                        <span class="footnote-text">
+                            Coleridge, Samuel Taylor, <em>Biographia Literaria</em>, ed. James Engell
+                            and W. Jackson Bate (Princeton: Princeton University Press, 1983), vol. I,
+                            pp. 304-305.
+                        </span>
+                    </div>
+
+                    <div class="footnote-item">
+                        <span class="footnote-number">4.</span>
+                        <span class="footnote-text">
+                            For a comprehensive treatment, see Dale, Peter Allan, <em>The Victorian Critic
+                            and the Idea of History</em> (Cambridge: Harvard University Press, 1977).
+                        </span>
+                    </div>
+
+                    <div class="footnote-item">
+                        <span class="footnote-number">5.</span>
+                        <span class="footnote-text">
+                            Arnold, Matthew, "The Study of Poetry," in <em>Essays in Criticism: Second
+                            Series</em> (London: Macmillan, 1888), p. 2.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="bibliography">
+                    <div class="bibliography-heading">Selected Bibliography</div>
+
+                    <div class="bibliography-entry">
+                        Abrams, M.H. <em>The Mirror and the Lamp: Romantic Theory and the Critical
+                        Tradition.</em> New York: Oxford University Press, 1953.
+                    </div>
+
+                    <div class="bibliography-entry">
+                        Arnold, Matthew. <em>Essays in Criticism: Second Series.</em> London: Macmillan, 1888.
+                    </div>
+
+                    <div class="bibliography-entry">
+                        Coleridge, Samuel Taylor. <em>Biographia Literaria.</em> Edited by James Engell
+                        and W. Jackson Bate. 2 vols. Princeton: Princeton University Press, 1983.
+                    </div>
+
+                    <div class="bibliography-entry">
+                        Dale, Peter Allan. <em>The Victorian Critic and the Idea of History.</em>
+                        Cambridge: Harvard University Press, 1977.
+                    </div>
+
+                    <div class="bibliography-entry">
+                        Hobsbawm, Eric. <em>The Age of Revolution: 1789-1848.</em> London: Weidenfeld
+                        & Nicolson, 1962.
+                    </div>
+
+                    <div class="bibliography-entry">
+                        Wellek, René. <em>A History of Modern Criticism: 1750-1950.</em> 4 vols.
+                        New Haven: Yale University Press, 1955-1965.
+                    </div>
+                </div>
+
+                <div class="page-footer">
+                    <div class="page-number">— 147 —</div>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <script>
+        // Page reveal animation
+        window.addEventListener('load', () => {
+            const page = document.querySelector('.journal-page');
+            page.style.opacity = '0';
+            page.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                page.style.transition = 'all 1s ease';
+                page.style.opacity = '1';
+                page.style.transform = 'translateY(0)';
+            }, 100);
+        });
+
+        // Citation hover effect
+        document.querySelectorAll('.citation').forEach((citation, index) => {
+            citation.addEventListener('click', () => {
+                const footnoteNumber = citation.textContent.replace(/[^0-9]/g, '');
+                console.log(`📚 See footnote ${footnoteNumber} for reference details`);
+                alert(`Footnote ${footnoteNumber}: See notes section at end of article`);
+            });
+        });
+
+        // Interactive reading tracking
+        let readParagraphs = 0;
+        document.querySelectorAll('.paragraph').forEach((para, index) => {
+            para.addEventListener('click', () => {
+                readParagraphs++;
+                console.log(`📖 *page rustle* - Reading paragraph ${index + 1} (Total read: ${readParagraphs})`);
+            });
+        });
+
+        console.log('📚 The Quarterly Review loaded');
+        console.log('Volume: LXXIII, Number III');
+        console.log('Season: Autumn 1923');
+        console.log('Style: Academic Journal with scholarly apparatus');
+    </script>
+</body>
+</html>

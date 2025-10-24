@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medieval Manuscript</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+            background: #3a2a1a;
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Ambient monastery atmosphere */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 70% 70%, rgba(255, 140, 0, 0.08) 0%, transparent 40%);
+            pointer-events: none;
+            animation: candle-flicker 4s infinite ease-in-out;
+        }
+
+        @keyframes candle-flicker {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        /* Parchment page */
+        .manuscript-page {
+            width: 100%;
+            max-width: 900px;
+            background:
+                linear-gradient(135deg, #f4e8d0 0%, #e8d4b0 50%, #f0e0c0 100%);
+            padding: 0;
+            box-shadow:
+                0 0 0 20px #2a1810,
+                0 0 0 22px #8b6914,
+                0 30px 80px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        /* Parchment texture */
+        .manuscript-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(139, 105, 20, 0.03) 2px,
+                    rgba(139, 105, 20, 0.03) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(139, 105, 20, 0.02) 2px,
+                    rgba(139, 105, 20, 0.02) 4px
+                );
+            pointer-events: none;
+            mix-blend-mode: multiply;
+        }
+
+        /* Aging spots and stains */
+        .manuscript-page::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(101, 67, 33, 0.15) 0%, transparent 10%),
+                radial-gradient(circle at 80% 70%, rgba(101, 67, 33, 0.1) 0%, transparent 8%),
+                radial-gradient(circle at 50% 90%, rgba(101, 67, 33, 0.12) 0%, transparent 12%),
+                radial-gradient(circle at 10% 60%, rgba(101, 67, 33, 0.08) 0%, transparent 6%);
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            padding: 80px 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Ornate border */
+        .ornate-border {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            right: 40px;
+            bottom: 40px;
+            border: 3px solid #8b4513;
+            border-image: repeating-linear-gradient(
+                45deg,
+                #8b4513,
+                #8b4513 10px,
+                #cd853f 10px,
+                #cd853f 20px
+            ) 3;
+            pointer-events: none;
+        }
+
+        /* Corner decorations */
+        .corner-decoration {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            font-size: 2.5em;
+            color: #8b4513;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .corner-decoration.top-left { top: 25px; left: 25px; }
+        .corner-decoration.top-right { top: 25px; right: 25px; }
+        .corner-decoration.bottom-left { bottom: 25px; left: 25px; }
+        .corner-decoration.bottom-right { bottom: 25px; right: 25px; }
+
+        /* Illuminated header */
+        .manuscript-header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .header-decoration {
+            color: #8b4513;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .manuscript-title {
+            font-size: 3em;
+            color: #8b0000;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+            text-shadow:
+                2px 2px 0 #cd853f,
+                -1px -1px 0 rgba(0, 0, 0, 0.3);
+            font-family: 'Georgia', serif;
+        }
+
+        .manuscript-subtitle {
+            font-size: 1.2em;
+            color: #654321;
+            font-style: italic;
+            letter-spacing: 2px;
+        }
+
+        .date-inscription {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #8b6914;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* Chapter heading */
+        .chapter-heading {
+            text-align: center;
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .chapter-number {
+            font-size: 1.5em;
+            color: #8b0000;
+            font-weight: bold;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+        }
+
+        .chapter-name {
+            font-size: 2em;
+            color: #654321;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .decorative-line {
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #8b4513, transparent);
+            margin: 20px auto;
+        }
+
+        /* Illuminated initial letter */
+        .illuminated-initial {
+            float: left;
+            width: 120px;
+            height: 120px;
+            margin: 5px 20px 10px 0;
+            background: linear-gradient(135deg, #8b0000 0%, #cd5c5c 100%);
+            border: 4px solid #8b6914;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5em;
+            color: #f4e8d0;
+            font-weight: bold;
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            position: relative;
+            font-family: 'Georgia', serif;
+        }
+
+        .illuminated-initial::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 1px solid #ffd700;
+            pointer-events: none;
+        }
+
+        .illuminated-initial::after {
+            content: '❦';
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 0.3em;
+            color: #ffd700;
+        }
+
+        /* Body text */
+        .manuscript-text {
+            font-size: 1.15em;
+            line-height: 2;
+            color: #2d1810;
+            text-align: justify;
+            columns: 2;
+            column-gap: 40px;
+            column-rule: 1px solid rgba(139, 69, 19, 0.3);
+            hyphens: auto;
+        }
+
+        .paragraph {
+            margin-bottom: 1.5em;
+            break-inside: avoid;
+        }
+
+        .first-paragraph {
+            text-indent: 0;
+        }
+
+        /* Red letter text (rubric) */
+        .rubric {
+            color: #8b0000;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Marginalia - side notes */
+        .marginalia {
+            position: absolute;
+            right: -200px;
+            width: 180px;
+            font-size: 0.75em;
+            color: #8b6914;
+            font-style: italic;
+            line-height: 1.4;
+            border-left: 2px solid #cd853f;
+            padding-left: 10px;
+        }
+
+        /* Decorated quote */
+        .illuminated-quote {
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(139, 69, 19, 0.08);
+            border-left: 5px solid #8b4513;
+            border-right: 5px solid #8b4513;
+            column-span: all;
+            position: relative;
+        }
+
+        .illuminated-quote::before {
+            content: '❝';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 4em;
+            color: #8b4513;
+            opacity: 0.3;
+        }
+
+        .quote-text {
+            font-size: 1.3em;
+            font-style: italic;
+            color: #654321;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        /* Section break */
+        .section-break {
+            text-align: center;
+            margin: 30px 0;
+            color: #8b4513;
+            font-size: 1.5em;
+            letter-spacing: 15px;
+            column-span: all;
+        }
+
+        /* Colophon (end note) */
+        .colophon {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 3px double #8b4513;
+            text-align: center;
+            font-size: 0.9em;
+            color: #654321;
+            font-style: italic;
+            column-span: all;
+        }
+
+        .scribe-note {
+            margin-top: 15px;
+            font-size: 0.85em;
+            color: #8b6914;
+        }
+
+        /* Page number in Roman numerals */
+        .folio-number {
+            position: absolute;
+            bottom: 50px;
+            right: 60px;
+            font-size: 1em;
+            color: #8b6914;
+            font-weight: bold;
+        }
+
+        /* Decorative drop capital alternative */
+        .drop-cap::first-letter {
+            float: left;
+            font-size: 4.5em;
+            line-height: 0.9;
+            margin: 5px 10px 0 0;
+            color: #8b0000;
+            font-weight: bold;
+            text-shadow: 2px 2px 0 #cd853f;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 50px 30px;
+            }
+
+            .manuscript-text {
+                columns: 1;
+            }
+
+            .illuminated-initial {
+                width: 80px;
+                height: 80px;
+                font-size: 3.5em;
+                margin-right: 15px;
+            }
+
+            .manuscript-title {
+                font-size: 2em;
+            }
+
+            .marginalia {
+                display: none;
+            }
+
+            .ornate-border {
+                top: 30px;
+                left: 30px;
+                right: 30px;
+                bottom: 30px;
+            }
+        }
+
+        /* Hover effects */
+        .paragraph:hover {
+            background: rgba(205, 133, 63, 0.1);
+            padding: 5px;
+            margin-left: -5px;
+            margin-right: -5px;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="manuscript-page">
+        <div class="ornate-border"></div>
+
+        <div class="corner-decoration top-left">✤</div>
+        <div class="corner-decoration top-right">✤</div>
+        <div class="corner-decoration bottom-left">✤</div>
+        <div class="corner-decoration bottom-right">✤</div>
+
+        <div class="content-wrapper">
+            <header class="manuscript-header">
+                <div class="header-decoration">✠ ❦ ✠</div>
+                <h1 class="manuscript-title">Codex Mysteriorum</h1>
+                <p class="manuscript-subtitle">Liber Primus de Antiquis Legendis</p>
+                <p class="date-inscription">Anno Domini MCCXLV</p>
+            </header>
+
+            <div class="chapter-heading">
+                <div class="chapter-number">CAPITVLVM I</div>
+                <div class="decorative-line"></div>
+                <h2 class="chapter-name">De Dracone et Milite</h2>
+                <div class="decorative-line"></div>
+            </div>
+
+            <div class="manuscript-text">
+                <p class="paragraph first-paragraph">
+                    <span class="illuminated-initial">I</span>n the days of yore, when the kingdoms
+                    of men were young and the world was yet filled with wonders both terrible and
+                    magnificent, there lived a knight of noble birth and valiant heart. His name was
+                    Sir Aldric of Thornwood, and his deeds were sung by minstrels from the frozen
+                    northlands to the sun-baked deserts of the far south.
+                </p>
+
+                <p class="paragraph">
+                    <span class="rubric">This chronicle</span> doth recount the most perilous adventure
+                    of this worthy knight, when he did venture into the dark forest of Shadowmere to
+                    confront the ancient wyrm that had plagued the good people of Westmarch for three
+                    score years and more.
+                </p>
+
+                <p class="paragraph">
+                    The beast was said to be of enormous size, with scales as black as a moonless
+                    night and eyes that burned with the fires of perdition. Its breath could melt the
+                    strongest armor as wax before flame, and its roar could cause the very earth to
+                    tremble and the stoutest hearts to quail.
+                </p>
+
+                <div class="section-break">❖ ❖ ❖</div>
+
+                <p class="paragraph">
+                    Many brave souls had attempted to slay the creature, but none had returned to tell
+                    the tale. The dragon's lair was strewn with the broken weapons and tarnished armor
+                    of those who had dared to challenge it, a grim testament to its fearsome power.
+                </p>
+
+                <div class="illuminated-quote">
+                    <p class="quote-text">
+                        "Fortitudo et honor sunt arma militis, sed sapientia est scutum eius."<br>
+                        <em>(Courage and honor are the weapons of a knight, but wisdom is his shield.)</em>
+                    </p>
+                </div>
+
+                <p class="paragraph">
+                    Upon the morning of his departure, Sir Aldric did attend mass at the cathedral,
+                    where he prayed most fervently for divine protection and guidance. The good Bishop
+                    blessed his sword and gave unto him a relic of Saint Michael, the vanquisher of
+                    dragons, which the knight wore about his neck.
+                </p>
+
+                <p class="paragraph">
+                    His faithful squire, young Thomas of Ashford, did plead with tears in his eyes to
+                    accompany his master on this perilous quest. But Sir Aldric, knowing full well the
+                    dangers that awaited, commanded the youth to remain behind, saying: <span class="rubric">
+                    "If I should fall, thou must carry word of my fate to my lady wife and ensure that
+                    my lands are protected."</span>
+                </p>
+
+                <p class="paragraph">
+                    The journey to Shadowmere took three days through treacherous terrain. The forest
+                    grew darker and more foreboding with each passing mile, until scarce a ray of
+                    sunlight could penetrate the dense canopy above. Strange sounds echoed through the
+                    trees—howls and shrieks that seemed to belong to no earthly creature.
+                </p>
+
+                <p class="paragraph">
+                    At last, on the eve of the third day, Sir Aldric came upon a great cave, its mouth
+                    resembling the maw of some colossal beast. The ground before it was scorched and
+                    blackened, and the air itself seemed to shimmer with heat, though no fire was visible.
+                </p>
+
+                <p class="paragraph">
+                    The knight dismounted from his destrier and sent the faithful horse away with a
+                    slap upon its flank, for he knew not whether he would have need of it again. Then,
+                    drawing his blessed sword, he did enter the dragon's lair with a prayer upon his
+                    lips and courage in his heart.
+                </p>
+
+                <div class="section-break">✦ ✦ ✦</div>
+
+                <p class="paragraph drop-cap">
+                    What transpired within that accursed cave has been recorded by the chroniclers,
+                    though some do doubt the veracity of such tales. Yet this much is known to be true:
+                    Sir Aldric did emerge victorious ere the sun had set, though sorely wounded and
+                    bearing the dragon's head as proof of his valor.
+                </p>
+            </div>
+
+            <div class="colophon">
+                <p>Here endeth the first chapter of this most excellent chronicle</p>
+                <p class="scribe-note">
+                    Transcribed by Brother Augustine in the scriptorium of<br/>
+                    the Abbey of Saint Benedict, in the year of Our Lord 1245
+                </p>
+            </div>
+
+            <div class="folio-number">XVII</div>
+        </div>
+    </div>
+
+    <script>
+        // Parchment aging animation
+        window.addEventListener('load', () => {
+            const page = document.querySelector('.manuscript-page');
+            page.style.opacity = '0';
+            page.style.transform = 'scale(0.95)';
+
+            setTimeout(() => {
+                page.style.transition = 'all 1.2s ease';
+                page.style.opacity = '1';
+                page.style.transform = 'scale(1)';
+            }, 100);
+        });
+
+        // Simulate quill scratching sound on interaction
+        document.querySelectorAll('.paragraph').forEach((para, index) => {
+            para.addEventListener('click', () => {
+                console.log(`📜 *quill scratches on parchment* - Reading verse ${index + 1}`);
+            });
+        });
+
+        // Candle flicker effect intensity variation
+        let flickerIntensity = 0.8;
+        setInterval(() => {
+            flickerIntensity = 0.7 + Math.random() * 0.3;
+            document.body.style.filter = `brightness(${flickerIntensity})`;
+        }, 3000);
+
+        console.log('📜 Medieval Manuscript loaded');
+        console.log('Setting: Abbey Scriptorium, Anno Domini 1245');
+        console.log('Style: Illuminated Manuscript with Gothic elements');
+    </script>
+</body>
+</html>

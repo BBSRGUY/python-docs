@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renaissance Illuminated Manuscript</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Garamond', 'Palatino', serif;
+            background: linear-gradient(135deg, #1a0a0a 0%, #2a1a10 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Vellum/Parchment page */
+        .manuscript {
+            width: 100%;
+            max-width: 950px;
+            background:
+                linear-gradient(135deg, #fff8e7 0%, #fffbf0 50%, #fff5dc 100%);
+            padding: 0;
+            box-shadow:
+                0 0 0 25px #3a2515,
+                0 0 0 28px #d4af37,
+                0 40px 100px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        /* Gold leaf frame */
+        .gold-frame {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            right: 30px;
+            bottom: 30px;
+            border: 8px solid transparent;
+            border-image: linear-gradient(
+                45deg,
+                #d4af37 0%,
+                #f4e58a 25%,
+                #d4af37 50%,
+                #b8941e 75%,
+                #d4af37 100%
+            );
+            border-image-slice: 1;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Ornate corner decorations */
+        .corner-ornament {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, #d4af37, #b8941e);
+            clip-path: polygon(0 0, 100% 0, 100% 35%, 35% 35%, 35% 100%, 0 100%);
+            box-shadow: inset 2px 2px 4px rgba(255, 255, 255, 0.5);
+            z-index: 3;
+        }
+
+        .corner-ornament::after {
+            content: '✤';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 2em;
+            color: #3a2515;
+            text-shadow: 0 0 3px rgba(255, 215, 0, 0.8);
+        }
+
+        .corner-ornament.top-left { top: 15px; left: 15px; }
+        .corner-ornament.top-right { top: 15px; right: 15px; transform: rotate(90deg); }
+        .corner-ornament.bottom-left { bottom: 15px; left: 15px; transform: rotate(-90deg); }
+        .corner-ornament.bottom-right { bottom: 15px; right: 15px; transform: rotate(180deg); }
+
+        /* Content area */
+        .content-area {
+            padding: 80px 70px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Decorative side borders */
+        .side-decoration {
+            position: absolute;
+            width: 40px;
+            height: calc(100% - 160px);
+            top: 80px;
+        }
+
+        .side-decoration.left {
+            left: 20px;
+            background: linear-gradient(
+                180deg,
+                #d4af37 0%,
+                #b8941e 10%,
+                #c19f2b 20%,
+                #d4af37 30%,
+                #b8941e 40%,
+                #c19f2b 50%,
+                #d4af37 60%,
+                #b8941e 70%,
+                #c19f2b 80%,
+                #d4af37 90%,
+                #b8941e 100%
+            );
+            clip-path: polygon(
+                50% 0%, 100% 5%, 80% 15%, 90% 25%, 70% 35%, 85% 45%,
+                65% 55%, 80% 65%, 60% 75%, 75% 85%, 55% 95%, 50% 100%,
+                45% 95%, 25% 85%, 40% 75%, 20% 65%, 35% 55%, 15% 45%,
+                30% 35%, 10% 25%, 20% 15%, 0% 5%
+            );
+        }
+
+        .side-decoration.right {
+            right: 20px;
+            background: linear-gradient(
+                180deg,
+                #d4af37 0%,
+                #b8941e 10%,
+                #c19f2b 20%,
+                #d4af37 30%,
+                #b8941e 40%,
+                #c19f2b 50%,
+                #d4af37 60%,
+                #b8941e 70%,
+                #c19f2b 80%,
+                #d4af37 90%,
+                #b8941e 100%
+            );
+            clip-path: polygon(
+                50% 0%, 100% 5%, 80% 15%, 90% 25%, 70% 35%, 85% 45%,
+                65% 55%, 80% 65%, 60% 75%, 75% 85%, 55% 95%, 50% 100%,
+                45% 95%, 25% 85%, 40% 75%, 20% 65%, 35% 55%, 15% 45%,
+                30% 35%, 10% 25%, 20% 15%, 0% 5%
+            );
+        }
+
+        /* Title section */
+        .title-section {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .top-ornament {
+            font-size: 3em;
+            color: #d4af37;
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.6);
+            margin-bottom: 20px;
+        }
+
+        .manuscript-title {
+            font-size: 3.5em;
+            color: #8b0000;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            margin-bottom: 15px;
+            text-shadow:
+                2px 2px 0 #d4af37,
+                4px 4px 0 rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .title-decoration {
+            height: 4px;
+            width: 300px;
+            margin: 20px auto;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            color: #3a2515;
+            font-style: italic;
+            letter-spacing: 3px;
+        }
+
+        /* Historiated initial (large decorated letter) */
+        .historiated-initial {
+            float: left;
+            width: 150px;
+            height: 150px;
+            margin: 0 25px 15px 0;
+            background:
+                radial-gradient(circle at 30% 30%, #dc143c 0%, #8b0000 100%);
+            border: 6px solid #d4af37;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6em;
+            color: #fff8e7;
+            font-weight: bold;
+            box-shadow:
+                0 6px 12px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            font-family: 'Georgia', serif;
+        }
+
+        /* Decorative elements around initial */
+        .historiated-initial::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border: 2px solid #f4e58a;
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        .historiated-initial::after {
+            content: '❦';
+            position: absolute;
+            bottom: -15px;
+            right: -15px;
+            font-size: 0.4em;
+            color: #d4af37;
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.8);
+        }
+
+        /* Colored decorative letters in text */
+        .colored-capital {
+            color: #dc143c;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #d4af37;
+        }
+
+        /* Body text */
+        .manuscript-text {
+            font-size: 1.2em;
+            line-height: 2;
+            color: #2a1a10;
+            text-align: justify;
+            hyphens: auto;
+        }
+
+        .paragraph {
+            margin-bottom: 1.8em;
+        }
+
+        /* Illuminated border around text blocks */
+        .illuminated-block {
+            border: 4px double #d4af37;
+            padding: 30px;
+            margin: 40px 0;
+            background:
+                linear-gradient(135deg, rgba(212, 175, 55, 0.05), rgba(220, 20, 60, 0.05));
+            position: relative;
+        }
+
+        .illuminated-block::before,
+        .illuminated-block::after {
+            content: '✤';
+            position: absolute;
+            font-size: 2em;
+            color: #d4af37;
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.6);
+        }
+
+        .illuminated-block::before {
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .illuminated-block::after {
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%) rotate(180deg);
+        }
+
+        /* Decorative verse separator */
+        .verse-separator {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 1.5em;
+            color: #d4af37;
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.6);
+            letter-spacing: 15px;
+        }
+
+        /* Miniature illustration placeholder */
+        .miniature-illustration {
+            width: 100%;
+            height: 250px;
+            margin: 40px 0;
+            background:
+                linear-gradient(135deg, #4169e1 0%, #6495ed 50%, #87ceeb 100%);
+            border: 8px solid #d4af37;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        .miniature-illustration::before {
+            content: '⚜';
+            font-size: 6em;
+            color: #d4af37;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
+        }
+
+        .illustration-caption {
+            text-align: center;
+            font-style: italic;
+            font-size: 0.9em;
+            color: #8b6914;
+            margin-top: -30px;
+            margin-bottom: 30px;
+        }
+
+        /* Rubric (red text for important passages) */
+        .rubric {
+            color: #dc143c;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Colophon */
+        .colophon {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 4px double #d4af37;
+            text-align: center;
+            font-size: 1em;
+            color: #3a2515;
+        }
+
+        .colophon-text {
+            font-style: italic;
+            line-height: 1.8;
+        }
+
+        .scribe-signature {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #8b0000;
+            font-weight: bold;
+        }
+
+        /* Gold leaf accents */
+        .gold-accent {
+            color: #d4af37;
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.6);
+            font-weight: bold;
+        }
+
+        /* Parchment aging effect */
+        .manuscript::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 25% 35%, rgba(139, 90, 43, 0.08) 0%, transparent 20%),
+                radial-gradient(circle at 75% 65%, rgba(101, 67, 33, 0.06) 0%, transparent 18%);
+            pointer-events: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 60px 40px;
+            }
+
+            .historiated-initial {
+                width: 100px;
+                height: 100px;
+                font-size: 4em;
+                margin-right: 15px;
+            }
+
+            .manuscript-title {
+                font-size: 2.5em;
+            }
+
+            .side-decoration {
+                display: none;
+            }
+
+            .corner-ornament {
+                width: 80px;
+                height: 80px;
+            }
+
+            .miniature-illustration {
+                height: 200px;
+            }
+        }
+
+        /* Animation for gold shimmer */
+        @keyframes gold-shimmer {
+            0%, 100% {
+                filter: brightness(1);
+            }
+            50% {
+                filter: brightness(1.3);
+            }
+        }
+
+        .gold-frame {
+            animation: gold-shimmer 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="manuscript">
+        <div class="gold-frame"></div>
+        <div class="side-decoration left"></div>
+        <div class="side-decoration right"></div>
+
+        <div class="corner-ornament top-left"></div>
+        <div class="corner-ornament top-right"></div>
+        <div class="corner-ornament bottom-left"></div>
+        <div class="corner-ornament bottom-right"></div>
+
+        <div class="content-area">
+            <div class="title-section">
+                <div class="top-ornament">✤ ⚜ ✤</div>
+                <h1 class="manuscript-title">LIBER MIRABILIUM</h1>
+                <div class="title-decoration"></div>
+                <p class="subtitle">The Book of Wondrous Tales</p>
+            </div>
+
+            <div class="manuscript-text">
+                <p class="paragraph">
+                    <span class="historiated-initial">I</span>n the time when the great houses of
+                    Europe did flourish and the arts reached their zenith, there lived a philosopher
+                    most learned in the ways of both nature and metaphysics. His name was
+                    <span class="rubric">Magister Philippus de Medicis</span>, and he dwelt in the
+                    fair city of Florence, where the Arno flows swift and clear beneath bridges of
+                    ancient stone.
+                </p>
+
+                <p class="paragraph">
+                    <span class="colored-capital">T</span>his worthy gentleman had devoted his life
+                    to the study of the celestial spheres and the hidden properties of all created
+                    things. In his <span class="gold-accent">biblioteca</span>, which was renowned
+                    throughout Christendom, were gathered volumes beyond counting—works of the ancient
+                    Greeks and Romans, treatises by the learned Arabs, and the philosophical writings
+                    of the Church Fathers.
+                </p>
+
+                <div class="verse-separator">✦ ❦ ✦</div>
+
+                <p class="paragraph">
+                    <span class="colored-capital">U</span>pon a summer's evening, as the bells of
+                    the Duomo called the faithful to Vespers, Magister Philippus sat in his study,
+                    contemplating a most curious manuscript that had lately come into his possession.
+                    The volume, bound in leather and clasped with silver, bore no inscription to
+                    identify its author or place of origin.
+                </p>
+
+                <div class="miniature-illustration"></div>
+                <div class="illustration-caption">
+                    ~ Miniature depicting the Philosopher in his Study ~
+                </div>
+
+                <div class="illuminated-block">
+                    <p class="paragraph">
+                        <span class="rubric">"Sapientiam antiquorum quaerere debemus,"</span> he said
+                        unto himself, which is to say: <em>"We must seek the wisdom of the ancients."</em>
+                        For he believed, as did many learned men of his age, that the philosophers of
+                        old had possessed knowledge that had since been lost to the world.
+                    </p>
+                </div>
+
+                <p class="paragraph">
+                    <span class="colored-capital">T</span>he pages of the mysterious codex were
+                    covered in symbols and diagrams of great complexity. Some appeared to represent
+                    the movements of the heavens, while others depicted geometric figures of such
+                    intricate design that the eye could scarce follow their patterns. Yet most
+                    puzzling of all were certain illustrations that seemed to show devices and
+                    mechanisms unlike anything known to exist.
+                </p>
+
+                <p class="paragraph">
+                    <span class="colored-capital">A</span>s he studied these enigmatic pages by
+                    candlelight, Magister Philippus became aware of a curious property of the ink
+                    employed by the manuscript's creator. When held at certain angles to the flame,
+                    the characters would seem to shift and change, revealing <span class="gold-accent">
+                    hidden layers of meaning</span> beneath the surface text.
+                </p>
+
+                <div class="verse-separator">✤ ✤ ✤</div>
+
+                <p class="paragraph">
+                    <span class="colored-capital">I</span>t was then that he understood: the book
+                    was not merely a repository of knowledge, but rather a key—a cipher that, when
+                    properly comprehended, would unlock secrets of profound importance. What those
+                    secrets might be, he could not yet divine, but he resolved to dedicate himself
+                    to unraveling the mystery.
+                </p>
+
+                <p class="paragraph">
+                    <span class="colored-capital">T</span>hus began a quest that would consume the
+                    remainder of his days, leading him from the libraries of Italy to the ancient
+                    seats of learning in distant Constantinople, and eventually to discoveries that
+                    would astonish the world—though not in his own lifetime, for such is often the
+                    fate of those who seek after truth.
+                </p>
+            </div>
+
+            <div class="colophon">
+                <div class="colophon-text">
+                    <p>Here endeth the Prologue to the <em>Liber Mirabilium</em></p>
+                    <p>Written and illuminated in the workshop of <span class="gold-accent">
+                    Maestro Giovanni di Lorenzo</span></p>
+                    <p>At Florence, in the Year of Our Lord 1512</p>
+                </div>
+                <div class="scribe-signature">
+                    ✍ Giovanni di Lorenzo scripsit ✍
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Parchment reveal animation
+        window.addEventListener('load', () => {
+            const manuscript = document.querySelector('.manuscript');
+            manuscript.style.opacity = '0';
+            manuscript.style.transform = 'scale(0.95)';
+
+            setTimeout(() => {
+                manuscript.style.transition = 'all 1.5s ease';
+                manuscript.style.opacity = '1';
+                manuscript.style.transform = 'scale(1)';
+            }, 200);
+        });
+
+        // Simulate gold leaf shimmer on hover
+        document.querySelectorAll('.gold-accent').forEach(element => {
+            element.addEventListener('mouseenter', function() {
+                this.style.textShadow = '0 0 10px rgba(212, 175, 55, 1)';
+            });
+            element.addEventListener('mouseleave', function() {
+                this.style.textShadow = '0 0 5px rgba(212, 175, 55, 0.6)';
+            });
+        });
+
+        // Candlelight flicker effect
+        let brightness = 1;
+        setInterval(() => {
+            brightness = 0.95 + Math.random() * 0.1;
+            document.body.style.filter = `brightness(${brightness})`;
+        }, 2000);
+
+        // Interactive reading
+        document.querySelectorAll('.paragraph').forEach((para, index) => {
+            para.addEventListener('click', () => {
+                console.log(`📜 *rustle of vellum* - Reading paragraph ${index + 1}`);
+            });
+        });
+
+        console.log('✨ Renaissance Illuminated Manuscript loaded');
+        console.log('Setting: Florence, Anno Domini 1512');
+        console.log('Style: Italian Renaissance with gold leaf illumination');
+    </script>
+</body>
+</html>
