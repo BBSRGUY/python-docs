@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Daily Chronicle - 1895</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #1a1510;
+            padding: 40px 20px;
+            color: #0a0a0a;
+        }
+
+        .newspaper {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #f8f5ed;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        /* Aged paper effect */
+        .newspaper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 1px,
+                    rgba(139, 90, 43, 0.02) 1px,
+                    rgba(139, 90, 43, 0.02) 2px
+                );
+            pointer-events: none;
+        }
+
+        /* Yellowing and stains */
+        .newspaper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(139, 90, 43, 0.15) 0%, transparent 15%),
+                radial-gradient(circle at 85% 80%, rgba(101, 67, 33, 0.12) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(139, 90, 43, 0.05) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Masthead */
+        .masthead {
+            text-align: center;
+            border-top: 4px solid #2a2420;
+            border-bottom: 4px solid #2a2420;
+            padding: 30px 20px;
+            margin-bottom: 20px;
+            background: linear-gradient(180deg, transparent, rgba(139, 90, 43, 0.05), transparent);
+        }
+
+        .newspaper-name {
+            font-size: 4.5em;
+            font-weight: bold;
+            font-family: 'Palatino', 'Book Antiqua', serif;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .newspaper-motto {
+            font-size: 0.9em;
+            font-style: italic;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            color: #4a4a4a;
+        }
+
+        .publication-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding-top: 15px;
+            border-top: 1px solid #2a2420;
+            color: #4a4a4a;
+        }
+
+        /* Divider lines */
+        .section-divider {
+            height: 2px;
+            background: #2a2420;
+            margin: 20px 0;
+        }
+
+        .thin-divider {
+            height: 1px;
+            background: #6a6a6a;
+            margin: 15px 0;
+        }
+
+        /* Main content layout */
+        .newspaper-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .column {
+            font-size: 0.95em;
+        }
+
+        /* Headlines */
+        .main-headline {
+            font-size: 2.8em;
+            font-weight: bold;
+            line-height: 1.1;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            grid-column: 1 / -1;
+            border-bottom: 3px double #2a2420;
+            padding-bottom: 15px;
+        }
+
+        .sub-headline {
+            font-size: 1.5em;
+            font-weight: bold;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-headline {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Byline */
+        .byline {
+            font-size: 0.85em;
+            font-style: italic;
+            margin-bottom: 10px;
+            color: #4a4a4a;
+        }
+
+        .byline::before {
+            content: "By ";
+        }
+
+        /* Dateline */
+        .dateline {
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        /* Body text */
+        .article-text {
+            line-height: 1.7;
+            text-align: justify;
+            hyphens: auto;
+        }
+
+        .article-text p {
+            margin-bottom: 1em;
+        }
+
+        /* Drop cap */
+        .drop-cap::first-letter {
+            float: left;
+            font-size: 4.5em;
+            line-height: 0.85;
+            margin: 5px 8px 0 0;
+            font-weight: bold;
+        }
+
+        /* Pull quote */
+        .pull-quote {
+            border: 2px solid #2a2420;
+            padding: 20px;
+            margin: 20px 0;
+            background: rgba(139, 90, 43, 0.05);
+        }
+
+        .pull-quote-text {
+            font-size: 1.3em;
+            font-weight: bold;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        /* Advertisement boxes */
+        .advertisement {
+            border: 3px solid #2a2420;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            background: rgba(139, 90, 43, 0.03);
+        }
+
+        .ad-headline {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .ad-text {
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .ad-price {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .ad-footer {
+            font-size: 0.75em;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        /* Information box */
+        .info-box {
+            border: 2px solid #2a2420;
+            padding: 15px;
+            margin: 20px 0;
+            background: #f0ebe0;
+        }
+
+        .info-box-title {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .info-box-content {
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        /* Weather box */
+        .weather-box {
+            background: #e8e3d8;
+            border: 1px solid #2a2420;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .weather-title {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .weather-content {
+            font-size: 0.85em;
+            line-height: 1.5;
+        }
+
+        /* Special notice */
+        .special-notice {
+            background: #2a2420;
+            color: #f8f5ed;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .notice-text {
+            font-weight: bold;
+            font-size: 1.2em;
+            letter-spacing: 1px;
+        }
+
+        /* Continued mark */
+        .continued {
+            text-align: right;
+            font-style: italic;
+            font-size: 0.9em;
+            margin-top: 15px;
+        }
+
+        /* Page number */
+        .page-number {
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #2a2420;
+            font-weight: bold;
+        }
+
+        /* Decorative ornaments */
+        .ornament {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 15px 0;
+            color: #4a4a4a;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .newspaper-content {
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+
+            .newspaper-name {
+                font-size: 3em;
+            }
+
+            .main-headline {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .newspaper {
+                padding: 20px;
+            }
+
+            .newspaper-content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .newspaper-name {
+                font-size: 2.5em;
+                letter-spacing: 3px;
+            }
+
+            .main-headline {
+                font-size: 1.8em;
+            }
+
+            .publication-info {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        /* Print effect */
+        @media print {
+            body {
+                background: white;
+            }
+            .newspaper {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="newspaper">
+        <div class="content-wrapper">
+            <!-- Masthead -->
+            <header class="masthead">
+                <h1 class="newspaper-name">The Daily Chronicle</h1>
+                <p class="newspaper-motto">"Truth, Commerce, and Progress"</p>
+                <div class="publication-info">
+                    <span>Vol. XLVII, No. 12,843</span>
+                    <span>London, England</span>
+                    <span>Saturday, October 12, 1895</span>
+                    <span>Price: One Penny</span>
+                </div>
+            </header>
+
+            <!-- Main headline -->
+            <div class="newspaper-content">
+                <h2 class="main-headline">
+                    Remarkable Discovery in Egyptian Excavation
+                </h2>
+
+                <!-- Column 1 -->
+                <div class="column">
+                    <p class="dateline">Cairo, October 11</p>
+                    <p class="byline">Special Correspondent</p>
+
+                    <div class="article-text drop-cap">
+                        <p>
+                            Archaeologists working in the Valley of Kings have unearthed what may
+                            prove to be one of the most significant finds in recent memory. The
+                            expedition, led by Professor Reginald Thornbury of the British Museum,
+                            discovered an previously unknown chamber containing artifacts of
+                            extraordinary historical value.
+                        </p>
+
+                        <p>
+                            The discovery was made quite by accident when a member of the excavation
+                            team noticed an irregularity in the wall measurements of a known tomb.
+                            Upon closer inspection, the team uncovered a concealed doorway, sealed
+                            for what experts estimate to be approximately three thousand years.
+                        </p>
+
+                        <p>
+                            Professor Thornbury, in a telegram received yesterday evening, described
+                            the find as "beyond our wildest expectations." The chamber contains
+                            numerous papyrus scrolls, golden artifacts, and what appears to be a
+                            complete set of ceremonial objects.
+                        </p>
+                    </div>
+
+                    <div class="ornament">❦ ❦ ❦</div>
+
+                    <h3 class="section-headline">Royal Observatory Reports</h3>
+
+                    <div class="article-text">
+                        <p>
+                            The Royal Observatory at Greenwich has confirmed unusual stellar
+                            activity in the constellation Orion. Astronomers using the new
+                            telescope recently installed at the facility have observed phenomena
+                            previously undocumented in scientific literature.
+                        </p>
+                    </div>
+
+                    <div class="weather-box">
+                        <div class="weather-title">Today's Weather</div>
+                        <div class="weather-content">
+                            <p><strong>Morning:</strong> Partly cloudy with fog expected to clear by noon.</p>
+                            <p><strong>Afternoon:</strong> Fair weather, temperature 58°F.</p>
+                            <p><strong>Evening:</strong> Clear skies, mild temperatures.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2 -->
+                <div class="column">
+                    <div class="article-text">
+                        <p>
+                            Of particular interest is a series of hieroglyphic inscriptions that
+                            Professor Thornbury believes may contain previously unknown historical
+                            accounts. The professor has expressed his intention to dedicate the
+                            next several months to the careful translation and documentation of
+                            these texts.
+                        </p>
+
+                        <p>
+                            Lord Salisbury, upon being informed of the discovery, has pledged the
+                            full support of His Majesty's Government in ensuring the proper
+                            preservation and study of these remarkable finds. A special committee
+                            of the Royal Society has been convened to oversee the expedition's
+                            continued work.
+                        </p>
+                    </div>
+
+                    <div class="pull-quote">
+                        <p class="pull-quote-text">
+                            "This discovery will rewrite our understanding of ancient Egyptian
+                            civilization"
+                        </p>
+                    </div>
+
+                    <div class="article-text">
+                        <p>
+                            The discovery has generated considerable excitement among scholars
+                            throughout Europe. Dr. Heinrich Schliemann, the renowned German
+                            archaeologist, has sent his congratulations and expressed his desire
+                            to visit the site at the earliest opportunity.
+                        </p>
+                    </div>
+
+                    <div class="thin-divider"></div>
+
+                    <h3 class="section-headline">Parliament Convenes</h3>
+
+                    <div class="article-text">
+                        <p>
+                            The House of Commons is scheduled to reconvene on Monday next to
+                            debate the proposed reforms to the Factory Acts. The Prime Minister
+                            is expected to address concerns raised by manufacturing interests.
+                        </p>
+                        <p class="continued">(Continued on Page 3)</p>
+                    </div>
+
+                    <div class="advertisement">
+                        <div class="ad-headline">Hudson's Soap</div>
+                        <div class="ad-text">
+                            The Choice of Discriminating Households<br/>
+                            Throughout the Empire
+                        </div>
+                        <div class="ad-text">
+                            Removes the Most Stubborn Stains<br/>
+                            Gentle on the Finest Linens
+                        </div>
+                        <div class="ad-price">6d per Bar</div>
+                        <div class="ad-footer">
+                            Available at Fine Grocers and Chemists
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3 -->
+                <div class="column">
+                    <h3 class="sub-headline">Railway Expansion Continues Apace</h3>
+
+                    <div class="article-text">
+                        <p>
+                            The Great Western Railway Company has announced plans for significant
+                            expansion of its network throughout the southern counties. The proposed
+                            new lines will connect several towns and villages currently without
+                            direct rail service to London.
+                        </p>
+
+                        <p>
+                            Company officials project that construction will commence in the spring
+                            of next year, with completion expected within three years. The project
+                            is anticipated to provide employment for several hundred workmen.
+                        </p>
+                    </div>
+
+                    <div class="thin-divider"></div>
+
+                    <h3 class="section-headline">Metropolitan News</h3>
+
+                    <div class="article-text">
+                        <p>
+                            The Lord Mayor's procession will take place on Monday next, beginning
+                            at Temple Bar at eleven o'clock in the morning. The customary route
+                            through the City will be followed, with concluding ceremonies at the
+                            Guildhall.
+                        </p>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">Notice to Subscribers</div>
+                        <div class="info-box-content">
+                            Gentlemen wishing to place advertisements in our pages are directed
+                            to apply at our offices at Fleet Street between the hours of 9 and 4
+                            on weekdays. Terms available upon request.
+                        </div>
+                    </div>
+
+                    <div class="special-notice">
+                        <p class="notice-text">
+                            SPECIAL EVENING EDITION<br/>
+                            Will Be Published at 6 O'Clock
+                        </p>
+                    </div>
+
+                    <div class="advertisement">
+                        <div class="ad-headline">Finest Teas</div>
+                        <div class="ad-text">
+                            <strong>Fortnum & Mason</strong><br/>
+                            Purveyors to Her Majesty<br/>
+                            <br/>
+                            India & Ceylon Teas<br/>
+                            China Oolongs & Souchongs<br/>
+                            <br/>
+                            Piccadilly, London
+                        </div>
+                    </div>
+
+                    <div class="ornament">✤ ✤ ✤</div>
+
+                    <div class="article-text">
+                        <p style="font-size: 0.85em; text-align: center; font-style: italic;">
+                            Additional News & Announcements<br/>
+                            on Pages 2, 3, and 4
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="page-number">— PAGE ONE —</div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate ink aging effect
+        window.addEventListener('load', () => {
+            const newspaper = document.querySelector('.newspaper');
+            newspaper.style.opacity = '0';
+            newspaper.style.transform = 'scale(0.98) rotate(-0.5deg)';
+
+            setTimeout(() => {
+                newspaper.style.transition = 'all 1s ease';
+                newspaper.style.opacity = '1';
+                newspaper.style.transform = 'scale(1) rotate(0deg)';
+            }, 100);
+        });
+
+        // Simulate page crinkle on interaction
+        document.querySelectorAll('.article-text p').forEach((para, index) => {
+            para.addEventListener('click', () => {
+                console.log(`📰 *rustle of newsprint* - Reading article section ${index + 1}`);
+            });
+        });
+
+        // Random subtle rotations for authenticity
+        const newspaper = document.querySelector('.newspaper');
+        let currentRotation = 0;
+        setInterval(() => {
+            const randomRotation = (Math.random() - 0.5) * 0.3;
+            currentRotation += randomRotation;
+            currentRotation = Math.max(-1, Math.min(1, currentRotation));
+            newspaper.style.transform = `rotate(${currentRotation}deg)`;
+        }, 5000);
+
+        console.log('📰 The Daily Chronicle loaded');
+        console.log('Date: Saturday, October 12, 1895');
+        console.log('Price: One Penny');
+        console.log('Style: Victorian Era Newspaper');
+    </script>
+</body>
+</html>

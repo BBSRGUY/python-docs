@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Interactive Book</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 2000px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Ambient particles */
+        .ambient-particle {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: ambient-float 20s infinite ease-in-out;
+        }
+
+        @keyframes ambient-float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translate(100px, -100px) scale(1.5);
+                opacity: 0.6;
+            }
+        }
+
+        /* Book container */
+        .book-container {
+            position: relative;
+            width: 900px;
+            height: 600px;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+
+        .book-container.rotate-left {
+            transform: rotateY(-15deg);
+        }
+
+        .book-container.rotate-right {
+            transform: rotateY(15deg);
+        }
+
+        /* Book */
+        .book {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform: rotateY(-20deg) rotateX(5deg);
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Book Cover */
+        .book-cover {
+            position: absolute;
+            width: 450px;
+            height: 100%;
+            background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+            transform-style: preserve-3d;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .book-cover.front {
+            left: 450px;
+            transform: rotateY(0deg);
+            z-index: 10;
+        }
+
+        .book-cover.back {
+            left: 0;
+            transform: rotateY(0deg);
+            border-radius: 8px 0 0 8px;
+            background: linear-gradient(135deg, #654321 0%, #4a3219 100%);
+        }
+
+        .cover-content {
+            padding: 60px 40px;
+            color: #f4e4c1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-title {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .cover-author {
+            font-size: 1.3em;
+            font-style: italic;
+            color: #d4c4a1;
+        }
+
+        .cover-ornament {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
+            color: #d4c4a1;
+            opacity: 0.5;
+        }
+
+        /* Pages */
+        .pages {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 900px;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .page {
+            position: absolute;
+            width: 450px;
+            height: 100%;
+            background: linear-gradient(to right, #f9f6f0 0%, #fefdfb 50%, #f4f1eb 100%);
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow:
+                5px 0 15px rgba(0, 0, 0, 0.1),
+                inset -3px 0 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .page-left {
+            left: 0;
+        }
+
+        .page-right {
+            left: 450px;
+        }
+
+        .page.flipped {
+            transform: rotateY(-180deg);
+        }
+
+        /* Page content */
+        .page-content {
+            padding: 60px 50px;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            backface-visibility: hidden;
+        }
+
+        .page-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 60px 50px;
+            transform: rotateY(180deg);
+            backface-visibility: hidden;
+            background: linear-gradient(to left, #f9f6f0 0%, #fefdfb 50%, #f4f1eb 100%);
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 30px;
+            font-size: 0.9em;
+            color: #8b7355;
+        }
+
+        .page-number.left {
+            left: 50px;
+        }
+
+        .page-number.right {
+            right: 50px;
+        }
+
+        .page-title {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #2c1810;
+            border-bottom: 2px solid #d4c4a1;
+            padding-bottom: 15px;
+        }
+
+        .page-text {
+            font-size: 1.05em;
+            line-height: 1.8;
+            color: #3d2817;
+            text-align: justify;
+            column-count: 1;
+        }
+
+        .page-text p {
+            margin-bottom: 1em;
+        }
+
+        .drop-cap::first-letter {
+            float: left;
+            font-size: 4em;
+            line-height: 0.8;
+            margin: 5px 10px 0 0;
+            color: #8B4513;
+            font-weight: bold;
+        }
+
+        /* Book spine */
+        .book-spine {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 100%;
+            background: linear-gradient(to right, #4a3219 0%, #654321 50%, #4a3219 100%);
+            transform: rotateY(-90deg);
+            transform-origin: left center;
+            box-shadow:
+                -2px 0 10px rgba(0, 0, 0, 0.5),
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .spine-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-90deg);
+            color: #f4e4c1;
+            font-size: 1.2em;
+            white-space: nowrap;
+            letter-spacing: 3px;
+        }
+
+        /* Controls */
+        .controls {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            padding: 15px 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn:hover {
+            background: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .control-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Info panel */
+        .info-panel {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .info-title {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-value {
+            font-size: 1.3em;
+            color: #2c1810;
+            font-weight: bold;
+        }
+
+        /* View controls */
+        .view-controls {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .view-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .view-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        /* Bookmark ribbon */
+        .bookmark-ribbon {
+            position: absolute;
+            top: -20px;
+            right: 100px;
+            width: 30px;
+            height: 80px;
+            background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 15;
+        }
+
+        .bookmark-ribbon::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 15px;
+            background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .book-container {
+                width: 700px;
+                height: 500px;
+                transform: scale(0.9);
+            }
+
+            .book-cover,
+            .page {
+                width: 350px;
+            }
+
+            .page-right {
+                left: 350px;
+            }
+
+            .pages {
+                width: 700px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .book-container {
+                width: 500px;
+                height: 400px;
+                transform: scale(0.7);
+            }
+
+            .book-cover,
+            .page {
+                width: 250px;
+            }
+
+            .page-right {
+                left: 250px;
+            }
+
+            .pages {
+                width: 500px;
+            }
+
+            .info-panel,
+            .view-controls {
+                display: none;
+            }
+
+            .controls {
+                bottom: 20px;
+            }
+
+            .control-btn {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+        }
+
+        /* Page curl effect hint */
+        .page-curl-hint {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 80px;
+            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.05));
+            border-radius: 0 5px 5px 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .page:hover .page-curl-hint {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Ambient particles -->
+    <script>
+        for (let i = 0; i < 15; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'ambient-particle';
+            particle.style.width = Math.random() * 6 + 2 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            document.body.appendChild(particle);
+        }
+    </script>
+
+    <!-- Info Panel -->
+    <div class="info-panel">
+        <div class="info-title">Currently Reading</div>
+        <div class="info-value">Page <span id="current-page-display">1</span> of 8</div>
+    </div>
+
+    <!-- View Controls -->
+    <div class="view-controls">
+        <button class="view-btn" onclick="rotateView('reset')" title="Reset View">⟲</button>
+        <button class="view-btn" onclick="rotateView('left')" title="Rotate Left">←</button>
+        <button class="view-btn" onclick="rotateView('right')" title="Rotate Right">→</button>
+    </div>
+
+    <!-- Book Container -->
+    <div class="book-container" id="book-container">
+        <div class="bookmark-ribbon"></div>
+
+        <div class="book">
+            <!-- Book Spine -->
+            <div class="book-spine">
+                <div class="spine-text">CHRONICLES OF TIME</div>
+            </div>
+
+            <!-- Back Cover -->
+            <div class="book-cover back">
+                <div class="cover-content">
+                    <div style="text-align: center; margin-top: auto;">
+                        <p style="font-size: 0.9em; line-height: 1.6;">
+                            "A masterpiece of interactive storytelling that transcends
+                            the boundaries between reader and narrative."
+                        </p>
+                        <p style="margin-top: 20px; font-size: 0.8em; opacity: 0.8;">
+                            — The Literary Review
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pages Container -->
+            <div class="pages" id="pages">
+                <!-- Page 1 (Right side) -->
+                <div class="page page-right" id="page-1">
+                    <div class="page-content">
+                        <h2 class="page-title">Prologue</h2>
+                        <div class="page-text drop-cap">
+                            <p>
+                                Time, they say, is the great storyteller. It weaves narratives through
+                                the fabric of existence, threading moments into memories, seconds into
+                                centuries. This book you hold—or rather, that holds you—is more than
+                                mere pages and ink.
+                            </p>
+                            <p>
+                                It is a portal, a gateway between dimensions of understanding. As you
+                                turn each page, you're not simply progressing through a story; you're
+                                traveling through layers of reality itself.
+                            </p>
+                        </div>
+                        <div class="page-number right">1</div>
+                    </div>
+                    <div class="page-back">
+                        <h2 class="page-title">Chapter One</h2>
+                        <div class="page-text">
+                            <p>
+                                The library appeared at midnight, as it always did. Not in the sense of
+                                opening its doors, but in the sense of manifesting in our reality—
+                                crossing over from whatever ethereal plane it inhabited during daylight
+                                hours.
+                            </p>
+                            <p>
+                                Marcus had been coming here for seventeen years, ever since he first
+                                stumbled upon it during a particularly vivid dream. Or was it a dream?
+                                The line between waking and sleeping had blurred long ago.
+                            </p>
+                        </div>
+                        <div class="page-number left">2</div>
+                    </div>
+                    <div class="page-curl-hint"></div>
+                </div>
+
+                <!-- Page 2 (Right side) -->
+                <div class="page page-right" id="page-2">
+                    <div class="page-content">
+                        <div class="page-text">
+                            <p>
+                                The books here were different. They responded to touch, to thought, to
+                                the very essence of the reader. A volume about ancient civilizations
+                                might suddenly reveal passages about quantum physics if that's what
+                                your mind needed to understand.
+                            </p>
+                            <p>
+                                "You're late," came a voice from the shadows. The Librarian—nobody knew
+                                her real name—emerged from between the towering shelves, her form
+                                seeming to be composed of pages and starlight.
+                            </p>
+                        </div>
+                        <div class="page-number right">3</div>
+                    </div>
+                    <div class="page-back">
+                        <div class="page-text">
+                            <p>
+                                "I had to make sure I wasn't followed," Marcus replied, glancing back
+                                at the entrance that would vanish in an hour. "The Collectors are
+                                getting more aggressive."
+                            </p>
+                            <p>
+                                The Librarian nodded knowingly. The Collectors—those who sought to
+                                hoard knowledge rather than share it—had been hunting the midnight
+                                library for generations. They believed that if they could capture it,
+                                they could control all human understanding.
+                            </p>
+                            <p>
+                                But the library couldn't be controlled. It existed in the spaces
+                                between thoughts, in the moment between question and answer.
+                            </p>
+                        </div>
+                        <div class="page-number left">4</div>
+                    </div>
+                    <div class="page-curl-hint"></div>
+                </div>
+
+                <!-- Page 3 (Right side) -->
+                <div class="page page-right" id="page-3">
+                    <div class="page-content">
+                        <h2 class="page-title">Chapter Two</h2>
+                        <div class="page-text">
+                            <p>
+                                "There's something you need to see," the Librarian said, leading Marcus
+                                deeper into the stacks. The shelves seemed to rearrange themselves as
+                                they walked, creating a path that hadn't existed moments before.
+                            </p>
+                            <p>
+                                They stopped at a pedestal where a single book rested, glowing with an
+                                inner light. Its cover was blank, yet Marcus could swear he saw words
+                                forming and dissolving across its surface.
+                            </p>
+                        </div>
+                        <div class="page-number right">5</div>
+                    </div>
+                    <div class="page-back">
+                        <div class="page-text">
+                            <p>
+                                "This is the Chronicle of Possibilities," the Librarian explained. "It
+                                contains every story that could be told, every choice that could be
+                                made, every future that might unfold."
+                            </p>
+                            <p>
+                                Marcus reached out tentatively. The moment his fingers touched the
+                                cover, the book opened, its pages flipping rapidly until they settled
+                                on a passage written in his own handwriting—words he had never written,
+                                describing events he had never experienced.
+                            </p>
+                            <p>
+                                Yet somehow, they felt more real than his own memories.
+                            </p>
+                        </div>
+                        <div class="page-number left">6</div>
+                    </div>
+                    <div class="page-curl-hint"></div>
+                </div>
+
+                <!-- Page 4 (Right side) -->
+                <div class="page page-right" id="page-4">
+                    <div class="page-content">
+                        <div class="page-text">
+                            <p>
+                                "What does it mean?" Marcus whispered, unable to tear his eyes away
+                                from the impossible text.
+                            </p>
+                            <p>
+                                "It means," the Librarian said softly, "that you're about to make a
+                                choice that will echo across realities. The library has brought you
+                                here for a reason. It always does."
+                            </p>
+                            <p>
+                                As if in response to her words, the entire library began to shift. The
+                                walls became translucent, revealing other libraries beyond—infinite
+                                iterations of the same space, each slightly different, each containing
+                                slightly different versions of themselves.
+                            </p>
+                        </div>
+                        <div class="page-number right">7</div>
+                    </div>
+                    <div class="page-back">
+                        <h2 class="page-title" style="text-align: center; margin-top: 200px;">
+                            To Be Continued...
+                        </h2>
+                        <div style="text-align: center; margin-top: 40px; font-style: italic; color: #666;">
+                            <p>Turn the page to discover what happens next in</p>
+                            <p style="margin-top: 10px; font-size: 1.2em; color: #2c1810;">
+                                <strong>Chronicles of Time: Volume II</strong>
+                            </p>
+                        </div>
+                        <div class="page-number left">8</div>
+                    </div>
+                    <div class="page-curl-hint"></div>
+                </div>
+            </div>
+
+            <!-- Front Cover -->
+            <div class="book-cover front">
+                <div class="cover-content">
+                    <div class="cover-ornament">✦</div>
+                    <h1 class="cover-title">CHRONICLES<br/>OF TIME</h1>
+                    <p class="cover-author">by Alexandria Rivers</p>
+                    <div style="margin-top: auto; padding-top: 100px; opacity: 0.7;">
+                        <p style="font-size: 0.9em;">Volume I: The Midnight Library</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button class="control-btn" id="prev-btn" onclick="previousPage()">← Previous Page</button>
+        <button class="control-btn" id="next-btn" onclick="nextPage()">Next Page →</button>
+    </div>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 4;
+        const pages = [];
+
+        // Initialize pages array
+        for (let i = 1; i <= totalPages; i++) {
+            pages.push(document.getElementById(`page-${i}`));
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            prevBtn.disabled = currentPage === 0;
+            nextBtn.disabled = currentPage === totalPages;
+
+            // Update page display
+            document.getElementById('current-page-display').textContent = (currentPage * 2) || 1;
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                pages[currentPage].classList.add('flipped');
+                currentPage++;
+                updateButtons();
+                playPageSound();
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                pages[currentPage].classList.remove('flipped');
+                updateButtons();
+                playPageSound();
+            }
+        }
+
+        function rotateView(direction) {
+            const container = document.getElementById('book-container');
+            container.classList.remove('rotate-left', 'rotate-right');
+
+            if (direction === 'left') {
+                container.classList.add('rotate-left');
+            } else if (direction === 'right') {
+                container.classList.add('rotate-right');
+            }
+        }
+
+        function playPageSound() {
+            // Simulate page turn sound with console
+            console.log('📖 *page turn sound*');
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextPage();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousPage();
+            }
+        });
+
+        // Mouse interaction - click on right side to turn forward
+        document.getElementById('book-container').addEventListener('click', (e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const centerX = rect.width / 2;
+
+            if (clickX > centerX) {
+                nextPage();
+            } else {
+                previousPage();
+            }
+        });
+
+        // 3D tilt effect on mouse move
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetRotateY = -20;
+        let targetRotateX = 5;
+        let currentRotateY = -20;
+        let currentRotateX = 5;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+
+            targetRotateY = -20 + mouseX * 15;
+            targetRotateX = 5 - mouseY * 10;
+        });
+
+        function animate() {
+            currentRotateY += (targetRotateY - currentRotateY) * 0.05;
+            currentRotateX += (targetRotateX - currentRotateX) * 0.05;
+
+            const book = document.querySelector('.book');
+            book.style.transform = `rotateY(${currentRotateY}deg) rotateX(${currentRotateX}deg)`;
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Initialize
+        updateButtons();
+
+        console.log('📚 3D Interactive Book loaded!');
+        console.log('Controls:');
+        console.log('- Click right side of book or press →/Space to turn page forward');
+        console.log('- Click left side of book or press ← to turn page back');
+        console.log('- Move mouse to tilt the book in 3D');
+        console.log('- Use rotation controls in top-right corner');
+    </script>
+</body>
+</html>
